@@ -1,0 +1,313 @@
+{
+  "elements": {
+    "ledger_local": {
+      "id": {
+        "library_uri": "package:barakah/core/database/tables/ledger_local_table.dart",
+        "name": "ledger_local"
+      },
+      "declaration": {
+        "source_uri": "package:barakah/core/database/tables/ledger_local_table.dart",
+        "offset": 157,
+        "name": "LedgerLocalTable"
+      },
+      "references": [],
+      "type": "table",
+      "columns": [
+        {
+          "sqlType": {
+            "builtin": "int"
+          },
+          "nullable": false,
+          "nameInSql": "idx",
+          "nameInDart": "idx",
+          "declaration": {
+            "source_uri": "package:barakah/core/database/tables/ledger_local_table.dart",
+            "offset": 261,
+            "name": "idx"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "timestamp",
+          "nameInDart": "timestamp",
+          "declaration": {
+            "source_uri": "package:barakah/core/database/tables/ledger_local_table.dart",
+            "offset": 298,
+            "name": "timestamp"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "donor_alias",
+          "nameInDart": "donorAlias",
+          "declaration": {
+            "source_uri": "package:barakah/core/database/tables/ledger_local_table.dart",
+            "offset": 338,
+            "name": "donorAlias"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "campaign",
+          "nameInDart": "campaign",
+          "declaration": {
+            "source_uri": "package:barakah/core/database/tables/ledger_local_table.dart",
+            "offset": 379,
+            "name": "campaign"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "amount",
+          "nameInDart": "amount",
+          "declaration": {
+            "source_uri": "package:barakah/core/database/tables/ledger_local_table.dart",
+            "offset": 418,
+            "name": "amount"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "currency",
+          "nameInDart": "currency",
+          "declaration": {
+            "source_uri": "package:barakah/core/database/tables/ledger_local_table.dart",
+            "offset": 527,
+            "name": "currency"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// IDR, USD, atau SAR (lihat AppCurrency.code). Divalidasi di kode.",
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "amount_idr",
+          "nameInDart": "amountIdr",
+          "declaration": {
+            "source_uri": "package:barakah/core/database/tables/ledger_local_table.dart",
+            "offset": 566,
+            "name": "amountIdr"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "rate_used",
+          "nameInDart": "rateUsed",
+          "declaration": {
+            "source_uri": "package:barakah/core/database/tables/ledger_local_table.dart",
+            "offset": 606,
+            "name": "rateUsed"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "prev_hash",
+          "nameInDart": "prevHash",
+          "declaration": {
+            "source_uri": "package:barakah/core/database/tables/ledger_local_table.dart",
+            "offset": 645,
+            "name": "prevHash"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "int"
+          },
+          "nullable": false,
+          "nameInSql": "nonce",
+          "nameInDart": "nonce",
+          "declaration": {
+            "source_uri": "package:barakah/core/database/tables/ledger_local_table.dart",
+            "offset": 683,
+            "name": "nonce"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "hash",
+          "nameInDart": "hash",
+          "declaration": {
+            "source_uri": "package:barakah/core/database/tables/ledger_local_table.dart",
+            "offset": 722,
+            "name": "hash"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [
+            {
+              "type": "unique"
+            }
+          ],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "sync_state",
+          "nameInDart": "syncState",
+          "declaration": {
+            "source_uri": "package:barakah/core/database/tables/ledger_local_table.dart",
+            "offset": 813,
+            "name": "syncState"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": {
+            "elements": [
+              "const ",
+              {
+                "lexeme": "Constant",
+                "import_uri": "package:drift/src/runtime/query_builder/query_builder.dart"
+              },
+              "(",
+              {
+                "lexeme": "SyncState",
+                "import_uri": "package:barakah/core/sync/sync_status.dart"
+              },
+              ".pending)"
+            ]
+          },
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": "/// SyncState.pending, synced, atau failed.",
+          "constraints": [],
+          "customConstraints": null
+        }
+      ],
+      "existing_data_class": null,
+      "table_constraints": [
+        {
+          "type": "primary_key",
+          "columns": [
+            "idx"
+          ]
+        }
+      ],
+      "custom_parent_class": null,
+      "interfaces_for_row_class": [],
+      "fixed_entity_info_name": null,
+      "base_dart_name": "LedgerLocalTable",
+      "row_class_name": "LedgerLocalTableData",
+      "companion_class_name": null,
+      "without_rowid": false,
+      "strict": false,
+      "write_default_constraints": true,
+      "custom_constraints": [],
+      "attached_indices": []
+    }
+  },
+  "imports": [
+    "package:drift/drift.dart",
+    "package:barakah/core/sync/sync_status.dart"
+  ]
+}

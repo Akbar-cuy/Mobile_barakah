@@ -1,0 +1,1 @@
+{"valid_import":true,"imports":[{"uri":"package:drift/drift.dart","transitive":false},{"uri":"package:barakah/core/sync/sync_status.dart","transitive":false}],"elements":[{"kind":"table","name":"ledger_local","dart_name":"LedgerLocalTable"}]}

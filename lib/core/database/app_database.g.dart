@@ -1,0 +1,1522 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'app_database.dart';
+
+// ignore_for_file: type=lint
+class $LedgerLocalTableTable extends LedgerLocalTable
+    with TableInfo<$LedgerLocalTableTable, LedgerLocalTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LedgerLocalTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idxMeta = const VerificationMeta('idx');
+  @override
+  late final GeneratedColumn<int> idx = GeneratedColumn<int>(
+      'idx', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _timestampMeta =
+      const VerificationMeta('timestamp');
+  @override
+  late final GeneratedColumn<String> timestamp = GeneratedColumn<String>(
+      'timestamp', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _donorAliasMeta =
+      const VerificationMeta('donorAlias');
+  @override
+  late final GeneratedColumn<String> donorAlias = GeneratedColumn<String>(
+      'donor_alias', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _campaignMeta =
+      const VerificationMeta('campaign');
+  @override
+  late final GeneratedColumn<String> campaign = GeneratedColumn<String>(
+      'campaign', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _amountMeta = const VerificationMeta('amount');
+  @override
+  late final GeneratedColumn<String> amount = GeneratedColumn<String>(
+      'amount', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _currencyMeta =
+      const VerificationMeta('currency');
+  @override
+  late final GeneratedColumn<String> currency = GeneratedColumn<String>(
+      'currency', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _amountIdrMeta =
+      const VerificationMeta('amountIdr');
+  @override
+  late final GeneratedColumn<String> amountIdr = GeneratedColumn<String>(
+      'amount_idr', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _rateUsedMeta =
+      const VerificationMeta('rateUsed');
+  @override
+  late final GeneratedColumn<String> rateUsed = GeneratedColumn<String>(
+      'rate_used', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _prevHashMeta =
+      const VerificationMeta('prevHash');
+  @override
+  late final GeneratedColumn<String> prevHash = GeneratedColumn<String>(
+      'prev_hash', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _nonceMeta = const VerificationMeta('nonce');
+  @override
+  late final GeneratedColumn<int> nonce = GeneratedColumn<int>(
+      'nonce', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _hashMeta = const VerificationMeta('hash');
+  @override
+  late final GeneratedColumn<String> hash = GeneratedColumn<String>(
+      'hash', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
+  static const VerificationMeta _syncStateMeta =
+      const VerificationMeta('syncState');
+  @override
+  late final GeneratedColumn<String> syncState = GeneratedColumn<String>(
+      'sync_state', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(SyncState.pending));
+  @override
+  List<GeneratedColumn> get $columns => [
+        idx,
+        timestamp,
+        donorAlias,
+        campaign,
+        amount,
+        currency,
+        amountIdr,
+        rateUsed,
+        prevHash,
+        nonce,
+        hash,
+        syncState
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ledger_local';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<LedgerLocalTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('idx')) {
+      context.handle(
+          _idxMeta, idx.isAcceptableOrUnknown(data['idx']!, _idxMeta));
+    }
+    if (data.containsKey('timestamp')) {
+      context.handle(_timestampMeta,
+          timestamp.isAcceptableOrUnknown(data['timestamp']!, _timestampMeta));
+    } else if (isInserting) {
+      context.missing(_timestampMeta);
+    }
+    if (data.containsKey('donor_alias')) {
+      context.handle(
+          _donorAliasMeta,
+          donorAlias.isAcceptableOrUnknown(
+              data['donor_alias']!, _donorAliasMeta));
+    } else if (isInserting) {
+      context.missing(_donorAliasMeta);
+    }
+    if (data.containsKey('campaign')) {
+      context.handle(_campaignMeta,
+          campaign.isAcceptableOrUnknown(data['campaign']!, _campaignMeta));
+    } else if (isInserting) {
+      context.missing(_campaignMeta);
+    }
+    if (data.containsKey('amount')) {
+      context.handle(_amountMeta,
+          amount.isAcceptableOrUnknown(data['amount']!, _amountMeta));
+    } else if (isInserting) {
+      context.missing(_amountMeta);
+    }
+    if (data.containsKey('currency')) {
+      context.handle(_currencyMeta,
+          currency.isAcceptableOrUnknown(data['currency']!, _currencyMeta));
+    } else if (isInserting) {
+      context.missing(_currencyMeta);
+    }
+    if (data.containsKey('amount_idr')) {
+      context.handle(_amountIdrMeta,
+          amountIdr.isAcceptableOrUnknown(data['amount_idr']!, _amountIdrMeta));
+    } else if (isInserting) {
+      context.missing(_amountIdrMeta);
+    }
+    if (data.containsKey('rate_used')) {
+      context.handle(_rateUsedMeta,
+          rateUsed.isAcceptableOrUnknown(data['rate_used']!, _rateUsedMeta));
+    } else if (isInserting) {
+      context.missing(_rateUsedMeta);
+    }
+    if (data.containsKey('prev_hash')) {
+      context.handle(_prevHashMeta,
+          prevHash.isAcceptableOrUnknown(data['prev_hash']!, _prevHashMeta));
+    } else if (isInserting) {
+      context.missing(_prevHashMeta);
+    }
+    if (data.containsKey('nonce')) {
+      context.handle(
+          _nonceMeta, nonce.isAcceptableOrUnknown(data['nonce']!, _nonceMeta));
+    } else if (isInserting) {
+      context.missing(_nonceMeta);
+    }
+    if (data.containsKey('hash')) {
+      context.handle(
+          _hashMeta, hash.isAcceptableOrUnknown(data['hash']!, _hashMeta));
+    } else if (isInserting) {
+      context.missing(_hashMeta);
+    }
+    if (data.containsKey('sync_state')) {
+      context.handle(_syncStateMeta,
+          syncState.isAcceptableOrUnknown(data['sync_state']!, _syncStateMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {idx};
+  @override
+  LedgerLocalTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LedgerLocalTableData(
+      idx: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}idx'])!,
+      timestamp: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}timestamp'])!,
+      donorAlias: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}donor_alias'])!,
+      campaign: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}campaign'])!,
+      amount: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}amount'])!,
+      currency: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}currency'])!,
+      amountIdr: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}amount_idr'])!,
+      rateUsed: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}rate_used'])!,
+      prevHash: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}prev_hash'])!,
+      nonce: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}nonce'])!,
+      hash: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}hash'])!,
+      syncState: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}sync_state'])!,
+    );
+  }
+
+  @override
+  $LedgerLocalTableTable createAlias(String alias) {
+    return $LedgerLocalTableTable(attachedDatabase, alias);
+  }
+}
+
+class LedgerLocalTableData extends DataClass
+    implements Insertable<LedgerLocalTableData> {
+  final int idx;
+  final String timestamp;
+  final String donorAlias;
+  final String campaign;
+  final String amount;
+
+  /// IDR, USD, atau SAR (lihat AppCurrency.code). Divalidasi di kode.
+  final String currency;
+  final String amountIdr;
+  final String rateUsed;
+  final String prevHash;
+  final int nonce;
+  final String hash;
+
+  /// SyncState.pending, synced, atau failed.
+  final String syncState;
+  const LedgerLocalTableData(
+      {required this.idx,
+      required this.timestamp,
+      required this.donorAlias,
+      required this.campaign,
+      required this.amount,
+      required this.currency,
+      required this.amountIdr,
+      required this.rateUsed,
+      required this.prevHash,
+      required this.nonce,
+      required this.hash,
+      required this.syncState});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['idx'] = Variable<int>(idx);
+    map['timestamp'] = Variable<String>(timestamp);
+    map['donor_alias'] = Variable<String>(donorAlias);
+    map['campaign'] = Variable<String>(campaign);
+    map['amount'] = Variable<String>(amount);
+    map['currency'] = Variable<String>(currency);
+    map['amount_idr'] = Variable<String>(amountIdr);
+    map['rate_used'] = Variable<String>(rateUsed);
+    map['prev_hash'] = Variable<String>(prevHash);
+    map['nonce'] = Variable<int>(nonce);
+    map['hash'] = Variable<String>(hash);
+    map['sync_state'] = Variable<String>(syncState);
+    return map;
+  }
+
+  LedgerLocalTableCompanion toCompanion(bool nullToAbsent) {
+    return LedgerLocalTableCompanion(
+      idx: Value(idx),
+      timestamp: Value(timestamp),
+      donorAlias: Value(donorAlias),
+      campaign: Value(campaign),
+      amount: Value(amount),
+      currency: Value(currency),
+      amountIdr: Value(amountIdr),
+      rateUsed: Value(rateUsed),
+      prevHash: Value(prevHash),
+      nonce: Value(nonce),
+      hash: Value(hash),
+      syncState: Value(syncState),
+    );
+  }
+
+  factory LedgerLocalTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LedgerLocalTableData(
+      idx: serializer.fromJson<int>(json['idx']),
+      timestamp: serializer.fromJson<String>(json['timestamp']),
+      donorAlias: serializer.fromJson<String>(json['donorAlias']),
+      campaign: serializer.fromJson<String>(json['campaign']),
+      amount: serializer.fromJson<String>(json['amount']),
+      currency: serializer.fromJson<String>(json['currency']),
+      amountIdr: serializer.fromJson<String>(json['amountIdr']),
+      rateUsed: serializer.fromJson<String>(json['rateUsed']),
+      prevHash: serializer.fromJson<String>(json['prevHash']),
+      nonce: serializer.fromJson<int>(json['nonce']),
+      hash: serializer.fromJson<String>(json['hash']),
+      syncState: serializer.fromJson<String>(json['syncState']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'idx': serializer.toJson<int>(idx),
+      'timestamp': serializer.toJson<String>(timestamp),
+      'donorAlias': serializer.toJson<String>(donorAlias),
+      'campaign': serializer.toJson<String>(campaign),
+      'amount': serializer.toJson<String>(amount),
+      'currency': serializer.toJson<String>(currency),
+      'amountIdr': serializer.toJson<String>(amountIdr),
+      'rateUsed': serializer.toJson<String>(rateUsed),
+      'prevHash': serializer.toJson<String>(prevHash),
+      'nonce': serializer.toJson<int>(nonce),
+      'hash': serializer.toJson<String>(hash),
+      'syncState': serializer.toJson<String>(syncState),
+    };
+  }
+
+  LedgerLocalTableData copyWith(
+          {int? idx,
+          String? timestamp,
+          String? donorAlias,
+          String? campaign,
+          String? amount,
+          String? currency,
+          String? amountIdr,
+          String? rateUsed,
+          String? prevHash,
+          int? nonce,
+          String? hash,
+          String? syncState}) =>
+      LedgerLocalTableData(
+        idx: idx ?? this.idx,
+        timestamp: timestamp ?? this.timestamp,
+        donorAlias: donorAlias ?? this.donorAlias,
+        campaign: campaign ?? this.campaign,
+        amount: amount ?? this.amount,
+        currency: currency ?? this.currency,
+        amountIdr: amountIdr ?? this.amountIdr,
+        rateUsed: rateUsed ?? this.rateUsed,
+        prevHash: prevHash ?? this.prevHash,
+        nonce: nonce ?? this.nonce,
+        hash: hash ?? this.hash,
+        syncState: syncState ?? this.syncState,
+      );
+  LedgerLocalTableData copyWithCompanion(LedgerLocalTableCompanion data) {
+    return LedgerLocalTableData(
+      idx: data.idx.present ? data.idx.value : this.idx,
+      timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
+      donorAlias:
+          data.donorAlias.present ? data.donorAlias.value : this.donorAlias,
+      campaign: data.campaign.present ? data.campaign.value : this.campaign,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      currency: data.currency.present ? data.currency.value : this.currency,
+      amountIdr: data.amountIdr.present ? data.amountIdr.value : this.amountIdr,
+      rateUsed: data.rateUsed.present ? data.rateUsed.value : this.rateUsed,
+      prevHash: data.prevHash.present ? data.prevHash.value : this.prevHash,
+      nonce: data.nonce.present ? data.nonce.value : this.nonce,
+      hash: data.hash.present ? data.hash.value : this.hash,
+      syncState: data.syncState.present ? data.syncState.value : this.syncState,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LedgerLocalTableData(')
+          ..write('idx: $idx, ')
+          ..write('timestamp: $timestamp, ')
+          ..write('donorAlias: $donorAlias, ')
+          ..write('campaign: $campaign, ')
+          ..write('amount: $amount, ')
+          ..write('currency: $currency, ')
+          ..write('amountIdr: $amountIdr, ')
+          ..write('rateUsed: $rateUsed, ')
+          ..write('prevHash: $prevHash, ')
+          ..write('nonce: $nonce, ')
+          ..write('hash: $hash, ')
+          ..write('syncState: $syncState')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(idx, timestamp, donorAlias, campaign, amount,
+      currency, amountIdr, rateUsed, prevHash, nonce, hash, syncState);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LedgerLocalTableData &&
+          other.idx == this.idx &&
+          other.timestamp == this.timestamp &&
+          other.donorAlias == this.donorAlias &&
+          other.campaign == this.campaign &&
+          other.amount == this.amount &&
+          other.currency == this.currency &&
+          other.amountIdr == this.amountIdr &&
+          other.rateUsed == this.rateUsed &&
+          other.prevHash == this.prevHash &&
+          other.nonce == this.nonce &&
+          other.hash == this.hash &&
+          other.syncState == this.syncState);
+}
+
+class LedgerLocalTableCompanion extends UpdateCompanion<LedgerLocalTableData> {
+  final Value<int> idx;
+  final Value<String> timestamp;
+  final Value<String> donorAlias;
+  final Value<String> campaign;
+  final Value<String> amount;
+  final Value<String> currency;
+  final Value<String> amountIdr;
+  final Value<String> rateUsed;
+  final Value<String> prevHash;
+  final Value<int> nonce;
+  final Value<String> hash;
+  final Value<String> syncState;
+  const LedgerLocalTableCompanion({
+    this.idx = const Value.absent(),
+    this.timestamp = const Value.absent(),
+    this.donorAlias = const Value.absent(),
+    this.campaign = const Value.absent(),
+    this.amount = const Value.absent(),
+    this.currency = const Value.absent(),
+    this.amountIdr = const Value.absent(),
+    this.rateUsed = const Value.absent(),
+    this.prevHash = const Value.absent(),
+    this.nonce = const Value.absent(),
+    this.hash = const Value.absent(),
+    this.syncState = const Value.absent(),
+  });
+  LedgerLocalTableCompanion.insert({
+    this.idx = const Value.absent(),
+    required String timestamp,
+    required String donorAlias,
+    required String campaign,
+    required String amount,
+    required String currency,
+    required String amountIdr,
+    required String rateUsed,
+    required String prevHash,
+    required int nonce,
+    required String hash,
+    this.syncState = const Value.absent(),
+  })  : timestamp = Value(timestamp),
+        donorAlias = Value(donorAlias),
+        campaign = Value(campaign),
+        amount = Value(amount),
+        currency = Value(currency),
+        amountIdr = Value(amountIdr),
+        rateUsed = Value(rateUsed),
+        prevHash = Value(prevHash),
+        nonce = Value(nonce),
+        hash = Value(hash);
+  static Insertable<LedgerLocalTableData> custom({
+    Expression<int>? idx,
+    Expression<String>? timestamp,
+    Expression<String>? donorAlias,
+    Expression<String>? campaign,
+    Expression<String>? amount,
+    Expression<String>? currency,
+    Expression<String>? amountIdr,
+    Expression<String>? rateUsed,
+    Expression<String>? prevHash,
+    Expression<int>? nonce,
+    Expression<String>? hash,
+    Expression<String>? syncState,
+  }) {
+    return RawValuesInsertable({
+      if (idx != null) 'idx': idx,
+      if (timestamp != null) 'timestamp': timestamp,
+      if (donorAlias != null) 'donor_alias': donorAlias,
+      if (campaign != null) 'campaign': campaign,
+      if (amount != null) 'amount': amount,
+      if (currency != null) 'currency': currency,
+      if (amountIdr != null) 'amount_idr': amountIdr,
+      if (rateUsed != null) 'rate_used': rateUsed,
+      if (prevHash != null) 'prev_hash': prevHash,
+      if (nonce != null) 'nonce': nonce,
+      if (hash != null) 'hash': hash,
+      if (syncState != null) 'sync_state': syncState,
+    });
+  }
+
+  LedgerLocalTableCompanion copyWith(
+      {Value<int>? idx,
+      Value<String>? timestamp,
+      Value<String>? donorAlias,
+      Value<String>? campaign,
+      Value<String>? amount,
+      Value<String>? currency,
+      Value<String>? amountIdr,
+      Value<String>? rateUsed,
+      Value<String>? prevHash,
+      Value<int>? nonce,
+      Value<String>? hash,
+      Value<String>? syncState}) {
+    return LedgerLocalTableCompanion(
+      idx: idx ?? this.idx,
+      timestamp: timestamp ?? this.timestamp,
+      donorAlias: donorAlias ?? this.donorAlias,
+      campaign: campaign ?? this.campaign,
+      amount: amount ?? this.amount,
+      currency: currency ?? this.currency,
+      amountIdr: amountIdr ?? this.amountIdr,
+      rateUsed: rateUsed ?? this.rateUsed,
+      prevHash: prevHash ?? this.prevHash,
+      nonce: nonce ?? this.nonce,
+      hash: hash ?? this.hash,
+      syncState: syncState ?? this.syncState,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (idx.present) {
+      map['idx'] = Variable<int>(idx.value);
+    }
+    if (timestamp.present) {
+      map['timestamp'] = Variable<String>(timestamp.value);
+    }
+    if (donorAlias.present) {
+      map['donor_alias'] = Variable<String>(donorAlias.value);
+    }
+    if (campaign.present) {
+      map['campaign'] = Variable<String>(campaign.value);
+    }
+    if (amount.present) {
+      map['amount'] = Variable<String>(amount.value);
+    }
+    if (currency.present) {
+      map['currency'] = Variable<String>(currency.value);
+    }
+    if (amountIdr.present) {
+      map['amount_idr'] = Variable<String>(amountIdr.value);
+    }
+    if (rateUsed.present) {
+      map['rate_used'] = Variable<String>(rateUsed.value);
+    }
+    if (prevHash.present) {
+      map['prev_hash'] = Variable<String>(prevHash.value);
+    }
+    if (nonce.present) {
+      map['nonce'] = Variable<int>(nonce.value);
+    }
+    if (hash.present) {
+      map['hash'] = Variable<String>(hash.value);
+    }
+    if (syncState.present) {
+      map['sync_state'] = Variable<String>(syncState.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LedgerLocalTableCompanion(')
+          ..write('idx: $idx, ')
+          ..write('timestamp: $timestamp, ')
+          ..write('donorAlias: $donorAlias, ')
+          ..write('campaign: $campaign, ')
+          ..write('amount: $amount, ')
+          ..write('currency: $currency, ')
+          ..write('amountIdr: $amountIdr, ')
+          ..write('rateUsed: $rateUsed, ')
+          ..write('prevHash: $prevHash, ')
+          ..write('nonce: $nonce, ')
+          ..write('hash: $hash, ')
+          ..write('syncState: $syncState')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $OutboxTableTable extends OutboxTable
+    with TableInfo<$OutboxTableTable, OutboxTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OutboxTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _entityMeta = const VerificationMeta('entity');
+  @override
+  late final GeneratedColumn<String> entity = GeneratedColumn<String>(
+      'entity', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _opMeta = const VerificationMeta('op');
+  @override
+  late final GeneratedColumn<String> op = GeneratedColumn<String>(
+      'op', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _payloadMeta =
+      const VerificationMeta('payload');
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+      'payload', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _attemptsMeta =
+      const VerificationMeta('attempts');
+  @override
+  late final GeneratedColumn<int> attempts = GeneratedColumn<int>(
+      'attempts', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _lastErrorMeta =
+      const VerificationMeta('lastError');
+  @override
+  late final GeneratedColumn<String> lastError = GeneratedColumn<String>(
+      'last_error', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _nextAttemptAtMeta =
+      const VerificationMeta('nextAttemptAt');
+  @override
+  late final GeneratedColumn<DateTime> nextAttemptAt =
+      GeneratedColumn<DateTime>('next_attempt_at', aliasedName, false,
+          type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, entity, op, payload, createdAt, attempts, lastError, nextAttemptAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'outbox';
+  @override
+  VerificationContext validateIntegrity(Insertable<OutboxTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('entity')) {
+      context.handle(_entityMeta,
+          entity.isAcceptableOrUnknown(data['entity']!, _entityMeta));
+    } else if (isInserting) {
+      context.missing(_entityMeta);
+    }
+    if (data.containsKey('op')) {
+      context.handle(_opMeta, op.isAcceptableOrUnknown(data['op']!, _opMeta));
+    } else if (isInserting) {
+      context.missing(_opMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(_payloadMeta,
+          payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta));
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('attempts')) {
+      context.handle(_attemptsMeta,
+          attempts.isAcceptableOrUnknown(data['attempts']!, _attemptsMeta));
+    }
+    if (data.containsKey('last_error')) {
+      context.handle(_lastErrorMeta,
+          lastError.isAcceptableOrUnknown(data['last_error']!, _lastErrorMeta));
+    }
+    if (data.containsKey('next_attempt_at')) {
+      context.handle(
+          _nextAttemptAtMeta,
+          nextAttemptAt.isAcceptableOrUnknown(
+              data['next_attempt_at']!, _nextAttemptAtMeta));
+    } else if (isInserting) {
+      context.missing(_nextAttemptAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  OutboxTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OutboxTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      entity: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}entity'])!,
+      op: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}op'])!,
+      payload: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}payload'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      attempts: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}attempts'])!,
+      lastError: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}last_error']),
+      nextAttemptAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}next_attempt_at'])!,
+    );
+  }
+
+  @override
+  $OutboxTableTable createAlias(String alias) {
+    return $OutboxTableTable(attachedDatabase, alias);
+  }
+}
+
+class OutboxTableData extends DataClass implements Insertable<OutboxTableData> {
+  final int id;
+
+  /// Lihat OutboxEntity.
+  final String entity;
+
+  /// Lihat OutboxOp.
+  final String op;
+
+  /// Isi perubahan dalam JSON.
+  final String payload;
+  final DateTime createdAt;
+  final int attempts;
+  final String? lastError;
+
+  /// Saat paling cepat item boleh dicoba lagi.
+  final DateTime nextAttemptAt;
+  const OutboxTableData(
+      {required this.id,
+      required this.entity,
+      required this.op,
+      required this.payload,
+      required this.createdAt,
+      required this.attempts,
+      this.lastError,
+      required this.nextAttemptAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['entity'] = Variable<String>(entity);
+    map['op'] = Variable<String>(op);
+    map['payload'] = Variable<String>(payload);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['attempts'] = Variable<int>(attempts);
+    if (!nullToAbsent || lastError != null) {
+      map['last_error'] = Variable<String>(lastError);
+    }
+    map['next_attempt_at'] = Variable<DateTime>(nextAttemptAt);
+    return map;
+  }
+
+  OutboxTableCompanion toCompanion(bool nullToAbsent) {
+    return OutboxTableCompanion(
+      id: Value(id),
+      entity: Value(entity),
+      op: Value(op),
+      payload: Value(payload),
+      createdAt: Value(createdAt),
+      attempts: Value(attempts),
+      lastError: lastError == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastError),
+      nextAttemptAt: Value(nextAttemptAt),
+    );
+  }
+
+  factory OutboxTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OutboxTableData(
+      id: serializer.fromJson<int>(json['id']),
+      entity: serializer.fromJson<String>(json['entity']),
+      op: serializer.fromJson<String>(json['op']),
+      payload: serializer.fromJson<String>(json['payload']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      attempts: serializer.fromJson<int>(json['attempts']),
+      lastError: serializer.fromJson<String?>(json['lastError']),
+      nextAttemptAt: serializer.fromJson<DateTime>(json['nextAttemptAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'entity': serializer.toJson<String>(entity),
+      'op': serializer.toJson<String>(op),
+      'payload': serializer.toJson<String>(payload),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'attempts': serializer.toJson<int>(attempts),
+      'lastError': serializer.toJson<String?>(lastError),
+      'nextAttemptAt': serializer.toJson<DateTime>(nextAttemptAt),
+    };
+  }
+
+  OutboxTableData copyWith(
+          {int? id,
+          String? entity,
+          String? op,
+          String? payload,
+          DateTime? createdAt,
+          int? attempts,
+          Value<String?> lastError = const Value.absent(),
+          DateTime? nextAttemptAt}) =>
+      OutboxTableData(
+        id: id ?? this.id,
+        entity: entity ?? this.entity,
+        op: op ?? this.op,
+        payload: payload ?? this.payload,
+        createdAt: createdAt ?? this.createdAt,
+        attempts: attempts ?? this.attempts,
+        lastError: lastError.present ? lastError.value : this.lastError,
+        nextAttemptAt: nextAttemptAt ?? this.nextAttemptAt,
+      );
+  OutboxTableData copyWithCompanion(OutboxTableCompanion data) {
+    return OutboxTableData(
+      id: data.id.present ? data.id.value : this.id,
+      entity: data.entity.present ? data.entity.value : this.entity,
+      op: data.op.present ? data.op.value : this.op,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      attempts: data.attempts.present ? data.attempts.value : this.attempts,
+      lastError: data.lastError.present ? data.lastError.value : this.lastError,
+      nextAttemptAt: data.nextAttemptAt.present
+          ? data.nextAttemptAt.value
+          : this.nextAttemptAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OutboxTableData(')
+          ..write('id: $id, ')
+          ..write('entity: $entity, ')
+          ..write('op: $op, ')
+          ..write('payload: $payload, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('attempts: $attempts, ')
+          ..write('lastError: $lastError, ')
+          ..write('nextAttemptAt: $nextAttemptAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id, entity, op, payload, createdAt, attempts, lastError, nextAttemptAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OutboxTableData &&
+          other.id == this.id &&
+          other.entity == this.entity &&
+          other.op == this.op &&
+          other.payload == this.payload &&
+          other.createdAt == this.createdAt &&
+          other.attempts == this.attempts &&
+          other.lastError == this.lastError &&
+          other.nextAttemptAt == this.nextAttemptAt);
+}
+
+class OutboxTableCompanion extends UpdateCompanion<OutboxTableData> {
+  final Value<int> id;
+  final Value<String> entity;
+  final Value<String> op;
+  final Value<String> payload;
+  final Value<DateTime> createdAt;
+  final Value<int> attempts;
+  final Value<String?> lastError;
+  final Value<DateTime> nextAttemptAt;
+  const OutboxTableCompanion({
+    this.id = const Value.absent(),
+    this.entity = const Value.absent(),
+    this.op = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.attempts = const Value.absent(),
+    this.lastError = const Value.absent(),
+    this.nextAttemptAt = const Value.absent(),
+  });
+  OutboxTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String entity,
+    required String op,
+    required String payload,
+    required DateTime createdAt,
+    this.attempts = const Value.absent(),
+    this.lastError = const Value.absent(),
+    required DateTime nextAttemptAt,
+  })  : entity = Value(entity),
+        op = Value(op),
+        payload = Value(payload),
+        createdAt = Value(createdAt),
+        nextAttemptAt = Value(nextAttemptAt);
+  static Insertable<OutboxTableData> custom({
+    Expression<int>? id,
+    Expression<String>? entity,
+    Expression<String>? op,
+    Expression<String>? payload,
+    Expression<DateTime>? createdAt,
+    Expression<int>? attempts,
+    Expression<String>? lastError,
+    Expression<DateTime>? nextAttemptAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (entity != null) 'entity': entity,
+      if (op != null) 'op': op,
+      if (payload != null) 'payload': payload,
+      if (createdAt != null) 'created_at': createdAt,
+      if (attempts != null) 'attempts': attempts,
+      if (lastError != null) 'last_error': lastError,
+      if (nextAttemptAt != null) 'next_attempt_at': nextAttemptAt,
+    });
+  }
+
+  OutboxTableCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? entity,
+      Value<String>? op,
+      Value<String>? payload,
+      Value<DateTime>? createdAt,
+      Value<int>? attempts,
+      Value<String?>? lastError,
+      Value<DateTime>? nextAttemptAt}) {
+    return OutboxTableCompanion(
+      id: id ?? this.id,
+      entity: entity ?? this.entity,
+      op: op ?? this.op,
+      payload: payload ?? this.payload,
+      createdAt: createdAt ?? this.createdAt,
+      attempts: attempts ?? this.attempts,
+      lastError: lastError ?? this.lastError,
+      nextAttemptAt: nextAttemptAt ?? this.nextAttemptAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (entity.present) {
+      map['entity'] = Variable<String>(entity.value);
+    }
+    if (op.present) {
+      map['op'] = Variable<String>(op.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (attempts.present) {
+      map['attempts'] = Variable<int>(attempts.value);
+    }
+    if (lastError.present) {
+      map['last_error'] = Variable<String>(lastError.value);
+    }
+    if (nextAttemptAt.present) {
+      map['next_attempt_at'] = Variable<DateTime>(nextAttemptAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OutboxTableCompanion(')
+          ..write('id: $id, ')
+          ..write('entity: $entity, ')
+          ..write('op: $op, ')
+          ..write('payload: $payload, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('attempts: $attempts, ')
+          ..write('lastError: $lastError, ')
+          ..write('nextAttemptAt: $nextAttemptAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+abstract class _$AppDatabase extends GeneratedDatabase {
+  _$AppDatabase(QueryExecutor e) : super(e);
+  $AppDatabaseManager get managers => $AppDatabaseManager(this);
+  late final $LedgerLocalTableTable ledgerLocalTable =
+      $LedgerLocalTableTable(this);
+  late final $OutboxTableTable outboxTable = $OutboxTableTable(this);
+  late final LedgerDao ledgerDao = LedgerDao(this as AppDatabase);
+  late final OutboxDao outboxDao = OutboxDao(this as AppDatabase);
+  @override
+  Iterable<TableInfo<Table, Object?>> get allTables =>
+      allSchemaEntities.whereType<TableInfo<Table, Object?>>();
+  @override
+  List<DatabaseSchemaEntity> get allSchemaEntities =>
+      [ledgerLocalTable, outboxTable];
+}
+
+typedef $$LedgerLocalTableTableCreateCompanionBuilder
+    = LedgerLocalTableCompanion Function({
+  Value<int> idx,
+  required String timestamp,
+  required String donorAlias,
+  required String campaign,
+  required String amount,
+  required String currency,
+  required String amountIdr,
+  required String rateUsed,
+  required String prevHash,
+  required int nonce,
+  required String hash,
+  Value<String> syncState,
+});
+typedef $$LedgerLocalTableTableUpdateCompanionBuilder
+    = LedgerLocalTableCompanion Function({
+  Value<int> idx,
+  Value<String> timestamp,
+  Value<String> donorAlias,
+  Value<String> campaign,
+  Value<String> amount,
+  Value<String> currency,
+  Value<String> amountIdr,
+  Value<String> rateUsed,
+  Value<String> prevHash,
+  Value<int> nonce,
+  Value<String> hash,
+  Value<String> syncState,
+});
+
+class $$LedgerLocalTableTableFilterComposer
+    extends Composer<_$AppDatabase, $LedgerLocalTableTable> {
+  $$LedgerLocalTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get idx => $composableBuilder(
+      column: $table.idx, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get timestamp => $composableBuilder(
+      column: $table.timestamp, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get donorAlias => $composableBuilder(
+      column: $table.donorAlias, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get campaign => $composableBuilder(
+      column: $table.campaign, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get amount => $composableBuilder(
+      column: $table.amount, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get currency => $composableBuilder(
+      column: $table.currency, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get amountIdr => $composableBuilder(
+      column: $table.amountIdr, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get rateUsed => $composableBuilder(
+      column: $table.rateUsed, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get prevHash => $composableBuilder(
+      column: $table.prevHash, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get nonce => $composableBuilder(
+      column: $table.nonce, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get hash => $composableBuilder(
+      column: $table.hash, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get syncState => $composableBuilder(
+      column: $table.syncState, builder: (column) => ColumnFilters(column));
+}
+
+class $$LedgerLocalTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $LedgerLocalTableTable> {
+  $$LedgerLocalTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get idx => $composableBuilder(
+      column: $table.idx, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get timestamp => $composableBuilder(
+      column: $table.timestamp, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get donorAlias => $composableBuilder(
+      column: $table.donorAlias, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get campaign => $composableBuilder(
+      column: $table.campaign, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get amount => $composableBuilder(
+      column: $table.amount, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get currency => $composableBuilder(
+      column: $table.currency, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get amountIdr => $composableBuilder(
+      column: $table.amountIdr, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get rateUsed => $composableBuilder(
+      column: $table.rateUsed, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get prevHash => $composableBuilder(
+      column: $table.prevHash, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get nonce => $composableBuilder(
+      column: $table.nonce, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get hash => $composableBuilder(
+      column: $table.hash, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get syncState => $composableBuilder(
+      column: $table.syncState, builder: (column) => ColumnOrderings(column));
+}
+
+class $$LedgerLocalTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LedgerLocalTableTable> {
+  $$LedgerLocalTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get idx =>
+      $composableBuilder(column: $table.idx, builder: (column) => column);
+
+  GeneratedColumn<String> get timestamp =>
+      $composableBuilder(column: $table.timestamp, builder: (column) => column);
+
+  GeneratedColumn<String> get donorAlias => $composableBuilder(
+      column: $table.donorAlias, builder: (column) => column);
+
+  GeneratedColumn<String> get campaign =>
+      $composableBuilder(column: $table.campaign, builder: (column) => column);
+
+  GeneratedColumn<String> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<String> get currency =>
+      $composableBuilder(column: $table.currency, builder: (column) => column);
+
+  GeneratedColumn<String> get amountIdr =>
+      $composableBuilder(column: $table.amountIdr, builder: (column) => column);
+
+  GeneratedColumn<String> get rateUsed =>
+      $composableBuilder(column: $table.rateUsed, builder: (column) => column);
+
+  GeneratedColumn<String> get prevHash =>
+      $composableBuilder(column: $table.prevHash, builder: (column) => column);
+
+  GeneratedColumn<int> get nonce =>
+      $composableBuilder(column: $table.nonce, builder: (column) => column);
+
+  GeneratedColumn<String> get hash =>
+      $composableBuilder(column: $table.hash, builder: (column) => column);
+
+  GeneratedColumn<String> get syncState =>
+      $composableBuilder(column: $table.syncState, builder: (column) => column);
+}
+
+class $$LedgerLocalTableTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $LedgerLocalTableTable,
+    LedgerLocalTableData,
+    $$LedgerLocalTableTableFilterComposer,
+    $$LedgerLocalTableTableOrderingComposer,
+    $$LedgerLocalTableTableAnnotationComposer,
+    $$LedgerLocalTableTableCreateCompanionBuilder,
+    $$LedgerLocalTableTableUpdateCompanionBuilder,
+    (
+      LedgerLocalTableData,
+      BaseReferences<_$AppDatabase, $LedgerLocalTableTable,
+          LedgerLocalTableData>
+    ),
+    LedgerLocalTableData,
+    PrefetchHooks Function()> {
+  $$LedgerLocalTableTableTableManager(
+      _$AppDatabase db, $LedgerLocalTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LedgerLocalTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LedgerLocalTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LedgerLocalTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> idx = const Value.absent(),
+            Value<String> timestamp = const Value.absent(),
+            Value<String> donorAlias = const Value.absent(),
+            Value<String> campaign = const Value.absent(),
+            Value<String> amount = const Value.absent(),
+            Value<String> currency = const Value.absent(),
+            Value<String> amountIdr = const Value.absent(),
+            Value<String> rateUsed = const Value.absent(),
+            Value<String> prevHash = const Value.absent(),
+            Value<int> nonce = const Value.absent(),
+            Value<String> hash = const Value.absent(),
+            Value<String> syncState = const Value.absent(),
+          }) =>
+              LedgerLocalTableCompanion(
+            idx: idx,
+            timestamp: timestamp,
+            donorAlias: donorAlias,
+            campaign: campaign,
+            amount: amount,
+            currency: currency,
+            amountIdr: amountIdr,
+            rateUsed: rateUsed,
+            prevHash: prevHash,
+            nonce: nonce,
+            hash: hash,
+            syncState: syncState,
+          ),
+          createCompanionCallback: ({
+            Value<int> idx = const Value.absent(),
+            required String timestamp,
+            required String donorAlias,
+            required String campaign,
+            required String amount,
+            required String currency,
+            required String amountIdr,
+            required String rateUsed,
+            required String prevHash,
+            required int nonce,
+            required String hash,
+            Value<String> syncState = const Value.absent(),
+          }) =>
+              LedgerLocalTableCompanion.insert(
+            idx: idx,
+            timestamp: timestamp,
+            donorAlias: donorAlias,
+            campaign: campaign,
+            amount: amount,
+            currency: currency,
+            amountIdr: amountIdr,
+            rateUsed: rateUsed,
+            prevHash: prevHash,
+            nonce: nonce,
+            hash: hash,
+            syncState: syncState,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable<$LedgerLocalTableTable, LedgerLocalTableData>(
+                        table),
+                    BaseReferences<_$AppDatabase, $LedgerLocalTableTable,
+                        LedgerLocalTableData>(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$LedgerLocalTableTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $LedgerLocalTableTable,
+    LedgerLocalTableData,
+    $$LedgerLocalTableTableFilterComposer,
+    $$LedgerLocalTableTableOrderingComposer,
+    $$LedgerLocalTableTableAnnotationComposer,
+    $$LedgerLocalTableTableCreateCompanionBuilder,
+    $$LedgerLocalTableTableUpdateCompanionBuilder,
+    (
+      LedgerLocalTableData,
+      BaseReferences<_$AppDatabase, $LedgerLocalTableTable,
+          LedgerLocalTableData>
+    ),
+    LedgerLocalTableData,
+    PrefetchHooks Function()>;
+typedef $$OutboxTableTableCreateCompanionBuilder = OutboxTableCompanion
+    Function({
+  Value<int> id,
+  required String entity,
+  required String op,
+  required String payload,
+  required DateTime createdAt,
+  Value<int> attempts,
+  Value<String?> lastError,
+  required DateTime nextAttemptAt,
+});
+typedef $$OutboxTableTableUpdateCompanionBuilder = OutboxTableCompanion
+    Function({
+  Value<int> id,
+  Value<String> entity,
+  Value<String> op,
+  Value<String> payload,
+  Value<DateTime> createdAt,
+  Value<int> attempts,
+  Value<String?> lastError,
+  Value<DateTime> nextAttemptAt,
+});
+
+class $$OutboxTableTableFilterComposer
+    extends Composer<_$AppDatabase, $OutboxTableTable> {
+  $$OutboxTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get entity => $composableBuilder(
+      column: $table.entity, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get op => $composableBuilder(
+      column: $table.op, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get payload => $composableBuilder(
+      column: $table.payload, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get attempts => $composableBuilder(
+      column: $table.attempts, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get lastError => $composableBuilder(
+      column: $table.lastError, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get nextAttemptAt => $composableBuilder(
+      column: $table.nextAttemptAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$OutboxTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $OutboxTableTable> {
+  $$OutboxTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get entity => $composableBuilder(
+      column: $table.entity, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get op => $composableBuilder(
+      column: $table.op, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+      column: $table.payload, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get attempts => $composableBuilder(
+      column: $table.attempts, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get lastError => $composableBuilder(
+      column: $table.lastError, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get nextAttemptAt => $composableBuilder(
+      column: $table.nextAttemptAt,
+      builder: (column) => ColumnOrderings(column));
+}
+
+class $$OutboxTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OutboxTableTable> {
+  $$OutboxTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get entity =>
+      $composableBuilder(column: $table.entity, builder: (column) => column);
+
+  GeneratedColumn<String> get op =>
+      $composableBuilder(column: $table.op, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get attempts =>
+      $composableBuilder(column: $table.attempts, builder: (column) => column);
+
+  GeneratedColumn<String> get lastError =>
+      $composableBuilder(column: $table.lastError, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get nextAttemptAt => $composableBuilder(
+      column: $table.nextAttemptAt, builder: (column) => column);
+}
+
+class $$OutboxTableTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $OutboxTableTable,
+    OutboxTableData,
+    $$OutboxTableTableFilterComposer,
+    $$OutboxTableTableOrderingComposer,
+    $$OutboxTableTableAnnotationComposer,
+    $$OutboxTableTableCreateCompanionBuilder,
+    $$OutboxTableTableUpdateCompanionBuilder,
+    (
+      OutboxTableData,
+      BaseReferences<_$AppDatabase, $OutboxTableTable, OutboxTableData>
+    ),
+    OutboxTableData,
+    PrefetchHooks Function()> {
+  $$OutboxTableTableTableManager(_$AppDatabase db, $OutboxTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OutboxTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$OutboxTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$OutboxTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> entity = const Value.absent(),
+            Value<String> op = const Value.absent(),
+            Value<String> payload = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<int> attempts = const Value.absent(),
+            Value<String?> lastError = const Value.absent(),
+            Value<DateTime> nextAttemptAt = const Value.absent(),
+          }) =>
+              OutboxTableCompanion(
+            id: id,
+            entity: entity,
+            op: op,
+            payload: payload,
+            createdAt: createdAt,
+            attempts: attempts,
+            lastError: lastError,
+            nextAttemptAt: nextAttemptAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String entity,
+            required String op,
+            required String payload,
+            required DateTime createdAt,
+            Value<int> attempts = const Value.absent(),
+            Value<String?> lastError = const Value.absent(),
+            required DateTime nextAttemptAt,
+          }) =>
+              OutboxTableCompanion.insert(
+            id: id,
+            entity: entity,
+            op: op,
+            payload: payload,
+            createdAt: createdAt,
+            attempts: attempts,
+            lastError: lastError,
+            nextAttemptAt: nextAttemptAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable<$OutboxTableTable, OutboxTableData>(table),
+                    BaseReferences<_$AppDatabase, $OutboxTableTable,
+                        OutboxTableData>(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$OutboxTableTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $OutboxTableTable,
+    OutboxTableData,
+    $$OutboxTableTableFilterComposer,
+    $$OutboxTableTableOrderingComposer,
+    $$OutboxTableTableAnnotationComposer,
+    $$OutboxTableTableCreateCompanionBuilder,
+    $$OutboxTableTableUpdateCompanionBuilder,
+    (
+      OutboxTableData,
+      BaseReferences<_$AppDatabase, $OutboxTableTable, OutboxTableData>
+    ),
+    OutboxTableData,
+    PrefetchHooks Function()>;
+
+class $AppDatabaseManager {
+  final _$AppDatabase _db;
+  $AppDatabaseManager(this._db);
+  $$LedgerLocalTableTableTableManager get ledgerLocalTable =>
+      $$LedgerLocalTableTableTableManager(_db, _db.ledgerLocalTable);
+  $$OutboxTableTableTableManager get outboxTable =>
+      $$OutboxTableTableTableManager(_db, _db.outboxTable);
+}

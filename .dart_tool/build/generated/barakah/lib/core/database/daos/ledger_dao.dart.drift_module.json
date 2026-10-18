@@ -1,0 +1,54 @@
+{
+  "elements": {
+    "LedgerDao": {
+      "id": {
+        "library_uri": "package:barakah/core/database/daos/ledger_dao.dart",
+        "name": "LedgerDao"
+      },
+      "declaration": {
+        "source_uri": "package:barakah/core/database/daos/ledger_dao.dart",
+        "offset": 739,
+        "name": "LedgerDao"
+      },
+      "references": [
+        {
+          "library_uri": "package:barakah/core/database/tables/ledger_local_table.dart",
+          "name": "ledger_local"
+        }
+      ],
+      "type": "dao",
+      "tables": [
+        {
+          "library_uri": "package:barakah/core/database/tables/ledger_local_table.dart",
+          "name": "ledger_local"
+        }
+      ],
+      "views": [],
+      "includes": [],
+      "queries": [],
+      "dart_type": {
+        "elements": [
+          {
+            "lexeme": "LedgerDao",
+            "import_uri": "package:barakah/core/database/daos/ledger_dao.dart"
+          }
+        ]
+      },
+      "database": {
+        "elements": [
+          {
+            "lexeme": "AppDatabase",
+            "import_uri": "package:barakah/core/database/app_database.dart"
+          }
+        ]
+      }
+    }
+  },
+  "imports": [
+    "package:drift/drift.dart",
+    "package:barakah/core/constants/app_constants.dart",
+    "package:barakah/core/sync/sync_status.dart",
+    "package:barakah/core/database/app_database.dart",
+    "package:barakah/core/database/tables/ledger_local_table.dart"
+  ]
+}

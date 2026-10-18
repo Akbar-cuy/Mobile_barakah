@@ -1,0 +1,18 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'ledger_dao.dart';
+
+// ignore_for_file: type=lint
+mixin _$LedgerDaoMixin on DatabaseAccessor<AppDatabase> {
+  $LedgerLocalTableTable get ledgerLocalTable =>
+      attachedDatabase.ledgerLocalTable;
+  LedgerDaoManager get managers => LedgerDaoManager(this);
+}
+
+class LedgerDaoManager {
+  final _$LedgerDaoMixin _db;
+  LedgerDaoManager(this._db);
+  $$LedgerLocalTableTableTableManager get ledgerLocalTable =>
+      $$LedgerLocalTableTableTableManager(
+          _db.attachedDatabase, _db.ledgerLocalTable);
+}

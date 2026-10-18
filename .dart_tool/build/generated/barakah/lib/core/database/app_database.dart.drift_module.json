@@ -1,0 +1,60 @@
+{
+  "elements": {
+    "AppDatabase": {
+      "id": {
+        "library_uri": "package:barakah/core/database/app_database.dart",
+        "name": "AppDatabase"
+      },
+      "declaration": {
+        "source_uri": "package:barakah/core/database/app_database.dart",
+        "offset": 382,
+        "name": "AppDatabase"
+      },
+      "references": [
+        {
+          "library_uri": "package:barakah/core/database/tables/ledger_local_table.dart",
+          "name": "ledger_local"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/outbox_table.dart",
+          "name": "outbox"
+        }
+      ],
+      "type": "database",
+      "tables": [
+        {
+          "library_uri": "package:barakah/core/database/tables/ledger_local_table.dart",
+          "name": "ledger_local"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/outbox_table.dart",
+          "name": "outbox"
+        }
+      ],
+      "views": [],
+      "includes": [],
+      "queries": [],
+      "schema_version": 1,
+      "daos": [
+        {
+          "library_uri": "package:barakah/core/database/daos/ledger_dao.dart",
+          "name": "LedgerDao"
+        },
+        {
+          "library_uri": "package:barakah/core/database/daos/outbox_dao.dart",
+          "name": "OutboxDao"
+        }
+      ],
+      "has_constructor_arg": true
+    }
+  },
+  "imports": [
+    "package:drift/drift.dart",
+    "package:barakah/core/constants/app_constants.dart",
+    "package:barakah/core/sync/sync_status.dart",
+    "package:barakah/core/database/daos/ledger_dao.dart",
+    "package:barakah/core/database/daos/outbox_dao.dart",
+    "package:barakah/core/database/tables/ledger_local_table.dart",
+    "package:barakah/core/database/tables/outbox_table.dart"
+  ]
+}
