@@ -7,7 +7,7 @@
       },
       "declaration": {
         "source_uri": "package:barakah/core/database/app_database.dart",
-        "offset": 382,
+        "offset": 1259,
         "name": "AppDatabase"
       },
       "references": [
@@ -18,6 +18,46 @@
         {
           "library_uri": "package:barakah/core/database/tables/outbox_table.dart",
           "name": "outbox"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/settings_table.dart",
+          "name": "settings"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/prayer_cache_table.dart",
+          "name": "prayer_cache"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/rate_cache_table.dart",
+          "name": "rate_cache"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/donation_local_table.dart",
+          "name": "donation_local"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/tasbih_log_table.dart",
+          "name": "tasbih_log"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/quiz_attempt_table.dart",
+          "name": "quiz_attempt"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/quiz_question_table.dart",
+          "name": "quiz_question"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/chat_message_table.dart",
+          "name": "chat_message"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/feedback_local_table.dart",
+          "name": "feedback_local"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/favorite_mosque_table.dart",
+          "name": "favorite_mosque"
         }
       ],
       "type": "database",
@@ -29,6 +69,46 @@
         {
           "library_uri": "package:barakah/core/database/tables/outbox_table.dart",
           "name": "outbox"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/settings_table.dart",
+          "name": "settings"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/prayer_cache_table.dart",
+          "name": "prayer_cache"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/rate_cache_table.dart",
+          "name": "rate_cache"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/donation_local_table.dart",
+          "name": "donation_local"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/tasbih_log_table.dart",
+          "name": "tasbih_log"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/quiz_attempt_table.dart",
+          "name": "quiz_attempt"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/quiz_question_table.dart",
+          "name": "quiz_question"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/chat_message_table.dart",
+          "name": "chat_message"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/feedback_local_table.dart",
+          "name": "feedback_local"
+        },
+        {
+          "library_uri": "package:barakah/core/database/tables/favorite_mosque_table.dart",
+          "name": "favorite_mosque"
         }
       ],
       "views": [],
@@ -43,6 +123,14 @@
         {
           "library_uri": "package:barakah/core/database/daos/outbox_dao.dart",
           "name": "OutboxDao"
+        },
+        {
+          "library_uri": "package:barakah/core/database/daos/settings_dao.dart",
+          "name": "SettingsDao"
+        },
+        {
+          "library_uri": "package:barakah/core/database/daos/prayer_cache_dao.dart",
+          "name": "PrayerCacheDao"
         }
       ],
       "has_constructor_arg": true
@@ -54,7 +142,19 @@
     "package:barakah/core/sync/sync_status.dart",
     "package:barakah/core/database/daos/ledger_dao.dart",
     "package:barakah/core/database/daos/outbox_dao.dart",
+    "package:barakah/core/database/daos/prayer_cache_dao.dart",
+    "package:barakah/core/database/daos/settings_dao.dart",
+    "package:barakah/core/database/tables/chat_message_table.dart",
+    "package:barakah/core/database/tables/donation_local_table.dart",
+    "package:barakah/core/database/tables/favorite_mosque_table.dart",
+    "package:barakah/core/database/tables/feedback_local_table.dart",
     "package:barakah/core/database/tables/ledger_local_table.dart",
-    "package:barakah/core/database/tables/outbox_table.dart"
+    "package:barakah/core/database/tables/outbox_table.dart",
+    "package:barakah/core/database/tables/prayer_cache_table.dart",
+    "package:barakah/core/database/tables/quiz_attempt_table.dart",
+    "package:barakah/core/database/tables/quiz_question_table.dart",
+    "package:barakah/core/database/tables/rate_cache_table.dart",
+    "package:barakah/core/database/tables/settings_table.dart",
+    "package:barakah/core/database/tables/tasbih_log_table.dart"
   ]
 }

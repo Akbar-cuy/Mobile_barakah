@@ -1,0 +1,8 @@
+{
+  "elements": {},
+  "imports": [
+    "package:barakah/core/constants/app_constants.dart",
+    "package:barakah/core/security/hash_utils.dart",
+    "package:barakah/core/security/secure_storage_service.dart"
+  ]
+}

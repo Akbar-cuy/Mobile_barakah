@@ -1,6 +1,7 @@
 {
   "elements": {},
   "imports": [
+    "package:barakah/core/utils/validators.dart",
     "package:flutter_test/flutter_test.dart"
   ]
 }

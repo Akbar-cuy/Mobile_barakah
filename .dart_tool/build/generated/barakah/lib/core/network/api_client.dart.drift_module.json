@@ -1,0 +1,10 @@
+{
+  "elements": {},
+  "imports": [
+    "package:dio/dio.dart",
+    "package:barakah/core/config/app_config.dart",
+    "package:barakah/core/network/api_exception.dart",
+    "package:barakah/core/network/auth_interceptor.dart",
+    "package:barakah/core/network/token_store.dart"
+  ]
+}

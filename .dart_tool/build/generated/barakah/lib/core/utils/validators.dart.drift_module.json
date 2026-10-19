@@ -1,0 +1,7 @@
+{
+  "elements": {},
+  "imports": [
+    "package:barakah/core/constants/app_constants.dart",
+    "package:barakah/core/utils/formatters.dart"
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "elements": {
+    "PrayerCacheDao": {
+      "id": {
+        "library_uri": "package:barakah/core/database/daos/prayer_cache_dao.dart",
+        "name": "PrayerCacheDao"
+      },
+      "declaration": {
+        "source_uri": "package:barakah/core/database/daos/prayer_cache_dao.dart",
+        "offset": 298,
+        "name": "PrayerCacheDao"
+      },
+      "references": [
+        {
+          "library_uri": "package:barakah/core/database/tables/prayer_cache_table.dart",
+          "name": "prayer_cache"
+        }
+      ],
+      "type": "dao",
+      "tables": [
+        {
+          "library_uri": "package:barakah/core/database/tables/prayer_cache_table.dart",
+          "name": "prayer_cache"
+        }
+      ],
+      "views": [],
+      "includes": [],
+      "queries": [],
+      "dart_type": {
+        "elements": [
+          {
+            "lexeme": "PrayerCacheDao",
+            "import_uri": "package:barakah/core/database/daos/prayer_cache_dao.dart"
+          }
+        ]
+      },
+      "database": {
+        "elements": [
+          {
+            "lexeme": "AppDatabase",
+            "import_uri": "package:barakah/core/database/app_database.dart"
+          }
+        ]
+      }
+    }
+  },
+  "imports": [
+    "package:drift/drift.dart",
+    "package:barakah/core/database/app_database.dart",
+    "package:barakah/core/database/tables/prayer_cache_table.dart"
+  ]
+}

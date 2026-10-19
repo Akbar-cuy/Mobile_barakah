@@ -1,0 +1,53 @@
+{
+  "elements": {
+    "SettingsDao": {
+      "id": {
+        "library_uri": "package:barakah/core/database/daos/settings_dao.dart",
+        "name": "SettingsDao"
+      },
+      "declaration": {
+        "source_uri": "package:barakah/core/database/daos/settings_dao.dart",
+        "offset": 315,
+        "name": "SettingsDao"
+      },
+      "references": [
+        {
+          "library_uri": "package:barakah/core/database/tables/settings_table.dart",
+          "name": "settings"
+        }
+      ],
+      "type": "dao",
+      "tables": [
+        {
+          "library_uri": "package:barakah/core/database/tables/settings_table.dart",
+          "name": "settings"
+        }
+      ],
+      "views": [],
+      "includes": [],
+      "queries": [],
+      "dart_type": {
+        "elements": [
+          {
+            "lexeme": "SettingsDao",
+            "import_uri": "package:barakah/core/database/daos/settings_dao.dart"
+          }
+        ]
+      },
+      "database": {
+        "elements": [
+          {
+            "lexeme": "AppDatabase",
+            "import_uri": "package:barakah/core/database/app_database.dart"
+          }
+        ]
+      }
+    }
+  },
+  "imports": [
+    "package:drift/drift.dart",
+    "package:barakah/core/utils/date_time_utils.dart",
+    "package:barakah/core/database/app_database.dart",
+    "package:barakah/core/database/tables/settings_table.dart"
+  ]
+}

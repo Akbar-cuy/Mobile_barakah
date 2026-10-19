@@ -1,0 +1,18 @@
+{
+  "elements": {},
+  "imports": [
+    "package:flutter_riverpod/flutter_riverpod.dart",
+    "package:barakah/core/database/app_database.dart",
+    "package:barakah/core/database/daos/ledger_dao.dart",
+    "package:barakah/core/database/daos/outbox_dao.dart",
+    "package:barakah/core/database/daos/prayer_cache_dao.dart",
+    "package:barakah/core/database/daos/settings_dao.dart",
+    "package:barakah/core/network/api_client.dart",
+    "package:barakah/core/network/connectivity_service.dart",
+    "package:barakah/core/network/token_store.dart",
+    "package:barakah/core/security/encryption_service.dart",
+    "package:barakah/core/security/secure_storage_service.dart",
+    "package:barakah/core/sync/outbox_processor.dart",
+    "package:barakah/core/sync/sync_service.dart"
+  ]
+}

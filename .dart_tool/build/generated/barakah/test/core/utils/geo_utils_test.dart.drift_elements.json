@@ -1,0 +1,1 @@
+{"valid_import":true,"imports":[{"uri":"package:barakah/core/constants/app_constants.dart","transitive":false},{"uri":"package:barakah/core/utils/geo_utils.dart","transitive":false},{"uri":"package:flutter_test/flutter_test.dart","transitive":false}],"elements":[]}

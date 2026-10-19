@@ -1,6 +1,7 @@
 {
   "elements": {},
   "imports": [
+    "package:barakah/core/security/hash_utils.dart",
     "package:flutter_test/flutter_test.dart"
   ]
 }

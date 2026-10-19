@@ -1,0 +1,12 @@
+{
+  "elements": {},
+  "imports": [
+    "package:barakah/core/constants/api_endpoints.dart",
+    "package:barakah/core/database/daos/outbox_dao.dart",
+    "package:barakah/core/database/daos/settings_dao.dart",
+    "package:barakah/core/network/api_client.dart",
+    "package:barakah/core/network/connectivity_service.dart",
+    "package:barakah/core/sync/outbox_processor.dart",
+    "package:barakah/core/sync/sync_status.dart"
+  ]
+}
