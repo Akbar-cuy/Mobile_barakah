@@ -15,6 +15,8 @@
         "flutter_local_notifications",
         "flutter_riverpod",
         "flutter_secure_storage",
+        "go_router",
+        "local_auth",
         "path",
         "path_provider",
         "permission_handler",
@@ -170,6 +172,30 @@
       "name": "path",
       "version": "1.9.1",
       "dependencies": []
+    },
+    {
+      "name": "local_auth",
+      "version": "3.0.2",
+      "dependencies": [
+        "flutter",
+        "local_auth_android",
+        "local_auth_darwin",
+        "local_auth_platform_interface",
+        "local_auth_windows"
+      ]
+    },
+    {
+      "name": "go_router",
+      "version": "18.1.0",
+      "dependencies": [
+        "collection",
+        "cupertino_ui",
+        "flutter",
+        "flutter_web_plugins",
+        "logging",
+        "material_ui",
+        "meta"
+      ]
     },
     {
       "name": "flutter_secure_storage",
@@ -352,7 +378,7 @@
     },
     {
       "name": "meta",
-      "version": "1.19.0",
+      "version": "1.18.3",
       "dependencies": []
     },
     {
@@ -559,7 +585,7 @@
     },
     {
       "name": "sqlite3",
-      "version": "3.7.1",
+      "version": "3.5.2",
       "dependencies": [
         "code_assets",
         "collection",
@@ -627,7 +653,7 @@
     },
     {
       "name": "vector_math",
-      "version": "2.4.3",
+      "version": "2.4.0",
       "dependencies": []
     },
     {
@@ -730,18 +756,16 @@
     },
     {
       "name": "shared_preferences_foundation",
-      "version": "2.6.0",
+      "version": "2.5.7",
       "dependencies": [
-        "ffi",
         "flutter",
         "meta",
-        "objective_c",
         "shared_preferences_platform_interface"
       ]
     },
     {
       "name": "shared_preferences_android",
-      "version": "2.5.0",
+      "version": "2.5.1",
       "dependencies": [
         "flutter",
         "jni",
@@ -841,6 +865,74 @@
         "jni",
         "jni_flutter",
         "path_provider_platform_interface"
+      ]
+    },
+    {
+      "name": "local_auth_windows",
+      "version": "2.0.2",
+      "dependencies": [
+        "flutter",
+        "local_auth_platform_interface",
+        "meta"
+      ]
+    },
+    {
+      "name": "local_auth_platform_interface",
+      "version": "1.1.0",
+      "dependencies": [
+        "flutter",
+        "plugin_platform_interface"
+      ]
+    },
+    {
+      "name": "local_auth_darwin",
+      "version": "2.0.5",
+      "dependencies": [
+        "flutter",
+        "intl",
+        "local_auth_platform_interface",
+        "meta"
+      ]
+    },
+    {
+      "name": "local_auth_android",
+      "version": "2.3.0",
+      "dependencies": [
+        "flutter",
+        "flutter_plugin_android_lifecycle",
+        "intl",
+        "local_auth_platform_interface",
+        "meta"
+      ]
+    },
+    {
+      "name": "material_ui",
+      "version": "1.7.0",
+      "dependencies": [
+        "collection",
+        "cupertino_ui",
+        "flutter",
+        "flutter_localizations",
+        "intl",
+        "material_color_utilities",
+        "vector_math"
+      ]
+    },
+    {
+      "name": "flutter_web_plugins",
+      "version": "0.0.0",
+      "dependencies": [
+        "flutter"
+      ]
+    },
+    {
+      "name": "cupertino_ui",
+      "version": "1.1.3",
+      "dependencies": [
+        "collection",
+        "flutter",
+        "flutter_localizations",
+        "intl"
       ]
     },
     {
@@ -1021,13 +1113,6 @@
       ]
     },
     {
-      "name": "flutter_web_plugins",
-      "version": "0.0.0",
-      "dependencies": [
-        "flutter"
-      ]
-    },
-    {
       "name": "web_socket",
       "version": "1.0.1",
       "dependencies": [
@@ -1081,34 +1166,32 @@
     },
     {
       "name": "native_toolchain_c",
-      "version": "0.19.5",
+      "version": "0.19.2",
       "dependencies": [
         "code_assets",
-        "file",
         "glob",
         "hooks",
         "logging",
         "meta",
-        "process",
         "pub_semver"
       ]
     },
     {
       "name": "code_assets",
-      "version": "2.1.0",
+      "version": "1.2.1",
       "dependencies": [
         "collection",
-        "hooks",
-        "logging"
+        "hooks"
       ]
     },
     {
       "name": "hooks",
-      "version": "2.2.0",
+      "version": "2.0.2",
       "dependencies": [
         "collection",
         "crypto",
         "logging",
+        "meta",
         "pub_semver",
         "record_use",
         "yaml"
@@ -1155,19 +1238,6 @@
       ]
     },
     {
-      "name": "objective_c",
-      "version": "9.6.2",
-      "dependencies": [
-        "code_assets",
-        "collection",
-        "ffi",
-        "hooks",
-        "logging",
-        "meta",
-        "pub_semver"
-      ]
-    },
-    {
       "name": "jni",
       "version": "1.1.0",
       "dependencies": [
@@ -1197,11 +1267,49 @@
       ]
     },
     {
+      "name": "objective_c",
+      "version": "9.5.0",
+      "dependencies": [
+        "code_assets",
+        "collection",
+        "ffi",
+        "hooks",
+        "logging",
+        "meta",
+        "pub_semver"
+      ]
+    },
+    {
       "name": "jni_flutter",
       "version": "1.0.4+1",
       "dependencies": [
         "flutter",
         "jni"
+      ]
+    },
+    {
+      "name": "intl",
+      "version": "0.20.3",
+      "dependencies": [
+        "clock",
+        "meta",
+        "path"
+      ]
+    },
+    {
+      "name": "flutter_plugin_android_lifecycle",
+      "version": "2.0.35",
+      "dependencies": [
+        "flutter"
+      ]
+    },
+    {
+      "name": "flutter_localizations",
+      "version": "0.0.0",
+      "dependencies": [
+        "flutter",
+        "intl",
+        "path"
       ]
     },
     {
@@ -1230,9 +1338,8 @@
     },
     {
       "name": "xml",
-      "version": "7.1.0",
+      "version": "7.0.1",
       "dependencies": [
-        "args",
         "collection",
         "meta",
         "petitparser"
@@ -1249,17 +1356,8 @@
       ]
     },
     {
-      "name": "process",
-      "version": "5.0.6",
-      "dependencies": [
-        "file",
-        "path",
-        "platform"
-      ]
-    },
-    {
       "name": "record_use",
-      "version": "1.1.1",
+      "version": "0.6.0",
       "dependencies": [
         "collection",
         "meta",
@@ -1287,7 +1385,7 @@
     },
     {
       "name": "petitparser",
-      "version": "7.1.0",
+      "version": "7.0.2",
       "dependencies": [
         "collection",
         "meta"

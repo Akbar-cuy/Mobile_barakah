@@ -101,7 +101,7 @@ class OutboxProcessor {
         await api.request(
           'POST',
           ApiEndpoints.logout,
-          headers: {'Authorization': 'Bearer ${payload['access_token']}'},
+          body: {'refresh_token': payload['refresh_token']},
         );
       default:
         await api.request(

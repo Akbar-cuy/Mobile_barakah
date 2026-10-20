@@ -102,13 +102,19 @@ class SyncService {
     if (serverTime is String) await settings.set(_kLastPull, serverTime);
   }
 
+  Future<void> stop() async {
+    await _pendingSub?.cancel();
+    await _netSub?.cancel();
+    _pendingSub = null;
+    _netSub = null;
+  }
+
   void _emit() {
     if (!_controller.isClosed) _controller.add(status);
   }
 
   Future<void> dispose() async {
-    await _pendingSub?.cancel();
-    await _netSub?.cancel();
+    await stop();
     await _controller.close();
   }
 }

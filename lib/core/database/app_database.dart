@@ -45,4 +45,13 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   int get schemaVersion => AppConstants.databaseSchemaVersion;
+
+  /// Menghapus seluruh data lokal (FR-OUT-04).
+  Future<void> clearAllData() {
+    return transaction(() async {
+      for (final table in allTables) {
+        await delete(table).go();
+      }
+    });
+  }
 }
