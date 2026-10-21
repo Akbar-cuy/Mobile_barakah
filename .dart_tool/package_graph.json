@@ -7,11 +7,13 @@
       "name": "barakah",
       "version": "1.0.0+1",
       "dependencies": [
+        "crypto",
         "drift",
         "flutter",
         "flutter_local_notifications",
         "flutter_riverpod",
         "permission_handler",
+        "provider",
         "shared_preferences",
         "timezone"
       ],
@@ -136,6 +138,15 @@
       ]
     },
     {
+      "name": "provider",
+      "version": "6.1.5+1",
+      "dependencies": [
+        "collection",
+        "flutter",
+        "nested"
+      ]
+    },
+    {
       "name": "permission_handler",
       "version": "13.0.2",
       "dependencies": [
@@ -198,6 +209,13 @@
         "stack_trace",
         "stream_channel",
         "web"
+      ]
+    },
+    {
+      "name": "crypto",
+      "version": "3.0.7",
+      "dependencies": [
+        "typed_data"
       ]
     },
     {
@@ -349,13 +367,6 @@
         "pub_semver",
         "source_span",
         "yaml"
-      ]
-    },
-    {
-      "name": "crypto",
-      "version": "3.0.7",
-      "dependencies": [
-        "typed_data"
       ]
     },
     {
@@ -693,6 +704,13 @@
       ]
     },
     {
+      "name": "nested",
+      "version": "1.0.0",
+      "dependencies": [
+        "flutter"
+      ]
+    },
+    {
       "name": "permission_handler_platform_interface",
       "version": "4.4.1",
       "dependencies": [
@@ -824,6 +842,13 @@
       "dependencies": []
     },
     {
+      "name": "typed_data",
+      "version": "1.4.0",
+      "dependencies": [
+        "collection"
+      ]
+    },
+    {
       "name": "web_socket",
       "version": "1.0.1",
       "dependencies": [
@@ -846,13 +871,6 @@
       "dependencies": [
         "meta",
         "path"
-      ]
-    },
-    {
-      "name": "typed_data",
-      "version": "1.4.0",
-      "dependencies": [
-        "collection"
       ]
     },
     {
