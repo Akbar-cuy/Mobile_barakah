@@ -1,14 +1,11 @@
 // M13 Fitur LLM (FR-LLM)
-// Model pesan chat untuk fitur Tanya Fikih Dasar.
-// Tampilan gelembung ada di widgets/chat_bubble.dart.
 
 import 'dart:math';
 
-// Catatan wajib di setiap jawaban AI (FR-LLM-03)
+// (FR-LLM-03)
 const String catatanChat =
     'Ini informasi umum. Untuk kasus yang spesifik, tanyakan kepada ulama atau ustadz.';
 
-// ====== MODEL (sesuai tabel chat_message di PRD) ======
 class ChatMessage {
   String id; // dibuat di perangkat agar kirim ulang tidak menggandakan data
   String role; // 'user' atau 'assistant'
