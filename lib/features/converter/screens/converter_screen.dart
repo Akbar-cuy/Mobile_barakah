@@ -1,11 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-// M9 Konversi Waktu (FR-TZ) dan M10 Konversi Mata Uang (FR-CUR)
+import '../providers/converter_provider.dart';
+import '../widgets/currency_converter_tab.dart';
+import '../widgets/time_converter_tab.dart';
+
+// Layar Konversi: tab Waktu dan tab Mata Uang
 class ConverterScreen extends StatelessWidget {
   const ConverterScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: Text('ConverterScreen')));
+    return ChangeNotifierProvider(
+      create: (_) => ConverterProvider(),
+      child: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Konversi'),
+            bottom: const TabBar(
+              tabs: [
+                Tab(text: 'Waktu'),
+                Tab(text: 'Mata Uang'),
+              ],
+            ),
+          ),
+          body: const TabBarView(
+            children: [
+              TimeConverterTab(),
+              CurrencyConverterTab(),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

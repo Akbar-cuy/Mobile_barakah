@@ -12,6 +12,7 @@
         "flutter_local_notifications",
         "flutter_riverpod",
         "permission_handler",
+        "provider",
         "shared_preferences",
         "timezone"
       ],
@@ -133,6 +134,15 @@
         "shared_preferences_platform_interface",
         "shared_preferences_web",
         "shared_preferences_windows"
+      ]
+    },
+    {
+      "name": "provider",
+      "version": "6.1.5+1",
+      "dependencies": [
+        "collection",
+        "flutter",
+        "nested"
       ]
     },
     {
@@ -690,6 +700,13 @@
         "jni",
         "meta",
         "shared_preferences_platform_interface"
+      ]
+    },
+    {
+      "name": "nested",
+      "version": "1.0.0",
+      "dependencies": [
+        "flutter"
       ]
     },
     {
