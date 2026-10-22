@@ -11,14 +11,13 @@ import 'core/security/encryption_service.dart';
 import 'core/security/secure_storage_service.dart';
 import 'features/notification/providers/notification_provider.dart';
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    await dotenv.load(fileName: ".env");
-  } catch (e) {
-    debugPrint('Gagal memuat file .env: $e');
+    await dotenv.load(fileName: '.env');
+  } catch (error) {
+    debugPrint('Gagal memuat file .env: $error');
   }
 
   debugPrint('Konfigurasi: ${Env.summary}');
@@ -36,11 +35,17 @@ Future<void> main() async {
 
   try {
     await container.read(notificationServiceProvider).init();
-    final settings = await container.read(notificationSettingsStoreProvider).load();
+    final settings =
+        await container.read(notificationSettingsStoreProvider).load();
     await container.read(prayerSchedulerProvider).reschedule(settings);
-  } catch (e) {
-    debugPrint('Notifikasi belum siap: $e');
+  } catch (error) {
+    debugPrint('Notifikasi belum siap: $error');
   }
 
-  runApp(UncontrolledProviderScope(container: container, child: const BarakahApp()));
+  runApp(
+    UncontrolledProviderScope(
+      container: container,
+      child: const BarakahApp(),
+    ),
+  );
 }

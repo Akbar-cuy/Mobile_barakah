@@ -21,8 +21,9 @@ final prayerRepositoryProvider = Provider<PrayerRepository>((ref) {
 final locationServiceProvider =
     Provider<LocationService>((ref) => GeolocatorLocationService());
 
-final locationStoreProvider =
-    Provider<LocationStore>((ref) => LocationStore(ref.watch(settingsDaoProvider)));
+final locationStoreProvider = Provider<LocationStore>(
+  (ref) => LocationStore(ref.watch(settingsDaoProvider)),
+);
 
 class HomeState {
   const HomeState({
@@ -51,8 +52,8 @@ class HomeController extends AsyncNotifier<HomeState> {
     try {
       point = await ref.read(locationServiceProvider).current();
       await store.save(point);
-    } on LocationException catch (e) {
-      issue = e.issue;
+    } on LocationException catch (error) {
+      issue = error.issue;
       point = await store.load() ?? GeoPoint.defaultPoint;
     }
     final result = await ref.read(prayerRepositoryProvider).load(point);

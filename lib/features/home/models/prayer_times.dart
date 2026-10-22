@@ -18,7 +18,7 @@ enum PrayerName {
   bool get isObligatory => this != PrayerName.sunrise;
 
   static List<PrayerName> get obligatory =>
-      values.where((p) => p.isObligatory).toList(growable: false);
+      values.where((prayer) => prayer.isObligatory).toList(growable: false);
 }
 
 /// Jadwal satu hari untuk satu lokasi dan metode.
@@ -66,10 +66,15 @@ class PrayerTimes {
 
   /// Saat sholat sebagai waktu UTC.
   DateTime instant(PrayerName prayer) {
-    final d = date.split('-').map(int.parse).toList();
-    final t = times[prayer]!.split(':').map(int.parse).toList();
-    return DateTime.utc(d[0], d[1], d[2], t[0], t[1])
-        .subtract(Duration(minutes: utcOffsetMinutes));
+    final dateParts = date.split('-').map(int.parse).toList();
+    final timeParts = times[prayer]!.split(':').map(int.parse).toList();
+    return DateTime.utc(
+      dateParts[0],
+      dateParts[1],
+      dateParts[2],
+      timeParts[0],
+      timeParts[1],
+    ).subtract(Duration(minutes: utcOffsetMinutes));
   }
 
   PrayerCacheTableCompanion toCompanion(DateTime fetchedAt) {

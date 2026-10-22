@@ -1,4 +1,4 @@
-// M4 Beranda (FR-LBS-04). Satu baris waktu sholat.
+// M4 Beranda (FR-LBS-02). Satu baris waktu sholat.
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
@@ -20,9 +20,13 @@ class PrayerRow extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
       decoration: BoxDecoration(
-        color: highlighted ? scheme.secondaryContainer : scheme.surfaceContainer,
+        color:
+            highlighted ? scheme.secondaryContainer : scheme.surfaceContainer,
         borderRadius: BorderRadius.circular(AppRadius.medium),
       ),
       child: Row(
@@ -30,7 +34,9 @@ class PrayerRow extends StatelessWidget {
           Icon(
             highlighted ? Icons.notifications_active : Icons.access_time,
             size: 20,
-            color: highlighted ? scheme.onSecondaryContainer : scheme.onSurfaceVariant,
+            color: highlighted
+                ? scheme.onSecondaryContainer
+                : scheme.onSurfaceVariant,
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(child: Text(name, style: theme.textTheme.titleMedium)),

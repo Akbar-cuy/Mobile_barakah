@@ -10,7 +10,7 @@ class FeedbackEntry {
     required this.suggestion,
     required this.createdAt,
     required this.updatedAt,
-    required this.synced,
+    required this.syncState,
   });
 
   factory FeedbackEntry.fromRow(FeedbackLocalTableData row) {
@@ -21,7 +21,7 @@ class FeedbackEntry {
       suggestion: row.suggestion,
       createdAt: DateTime.parse(row.createdAt).toLocal(),
       updatedAt: DateTime.parse(row.updatedAt).toLocal(),
-      synced: row.syncState == SyncState.synced,
+      syncState: row.syncState,
     );
   }
 
@@ -31,7 +31,28 @@ class FeedbackEntry {
   final String suggestion;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String syncState;
 
-  /// False selama masih menunggu dikirim ke server.
-  final bool synced;
+  bool get isSynced => syncState == SyncState.synced;
+
+  /// Status yang tampil di riwayat (FR-FB-04).
+  String get statusLabel => isSynced ? 'Terkirim' : 'Menunggu';
+
+  FeedbackEntry copyWith({
+    int? rating,
+    String? impression,
+    String? suggestion,
+    DateTime? updatedAt,
+    String? syncState,
+  }) {
+    return FeedbackEntry(
+      id: id,
+      rating: rating ?? this.rating,
+      impression: impression ?? this.impression,
+      suggestion: suggestion ?? this.suggestion,
+      createdAt: createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      syncState: syncState ?? this.syncState,
+    );
+  }
 }

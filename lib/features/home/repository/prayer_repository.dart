@@ -33,11 +33,16 @@ class PrayerRepository {
   List<DateTime> _dates(int days, DateTime? from) {
     final start = from ?? _now();
     return [
-      for (var i = 0; i < days; i++) DateTime(start.year, start.month, start.day + i),
+      for (var i = 0; i < days; i++)
+        DateTime(start.year, start.month, start.day + i),
     ];
   }
 
-  Future<List<PrayerTimes>> cachedDays(GeoPoint point, {int days = 7, DateTime? from}) async {
+  Future<List<PrayerTimes>> cachedDays(
+    GeoPoint point, {
+    int days = 7,
+    DateTime? from,
+  }) async {
     final dates = _dates(days, from);
     final rows = await _dao.getRange(
       fromDate: DateTimeUtils.dateKey(dates.first),
@@ -54,7 +59,7 @@ class PrayerRepository {
     if (cached.length >= days) return PrayerResult(days: cached);
 
     try {
-      final months = {for (final d in dates) (d.year, d.month)};
+      final months = {for (final date in dates) (date.year, date.month)};
       for (final (year, month) in months) {
         final fetched = await _source.fetchMonth(
           lat: point.lat,
@@ -64,12 +69,16 @@ class PrayerRepository {
           method: method,
           locationKey: point.locationKey,
         );
-        final now = _now();
-        await _dao.upsertAll([for (final d in fetched) d.toCompanion(now)]);
+        final fetchedAt = _now();
+        await _dao.upsertAll([
+          for (final day in fetched) day.toCompanion(fetchedAt),
+        ]);
       }
       await _dao.deleteBefore(DateTimeUtils.dateKey(dates.first));
       final fresh = await cachedDays(point, days: days);
-      if (fresh.isEmpty) throw const PrayerFetchException('Jadwal sholat kosong.');
+      if (fresh.isEmpty) {
+        throw const PrayerFetchException('Jadwal sholat kosong.');
+      }
       return PrayerResult(days: fresh);
     } on PrayerFetchException {
       if (cached.isNotEmpty) return PrayerResult(days: cached, offline: true);

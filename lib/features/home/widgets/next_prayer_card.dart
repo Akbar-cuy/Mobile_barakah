@@ -1,4 +1,4 @@
-// M4 Beranda (FR-LBS-05). Kartu sholat berikutnya dengan hitung mundur.
+// M4 Beranda (FR-LBS-02). Kartu sholat berikutnya dengan hitung mundur.
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -52,30 +52,35 @@ class _NextPrayerCardState extends State<NextPrayerCard> {
       child: next == null
           ? Text(
               'Seluruh jadwal yang tersedia sudah lewat. Tarik layar ke bawah untuk memuat ulang.',
-              style: theme.textTheme.bodyLarge?.copyWith(color: scheme.onPrimaryContainer),
+              style: theme.textTheme.bodyLarge
+                  ?.copyWith(color: scheme.onPrimaryContainer),
             )
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Sholat berikutnya',
-                  style: theme.textTheme.labelLarge?.copyWith(color: scheme.onPrimaryContainer),
+                  style: theme.textTheme.labelLarge
+                      ?.copyWith(color: scheme.onPrimaryContainer),
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   '${next.name.label}  '
                   '${DateTimeUtils.hm(TimezoneService.wallClock(widget.zone, next.at, next.day.utcOffsetMinutes))}'
                   ' ${widget.zone == AppZone.local ? '' : widget.zone.label}',
-                  style: theme.textTheme.headlineMedium?.copyWith(color: scheme.onPrimaryContainer),
+                  style: theme.textTheme.headlineMedium
+                      ?.copyWith(color: scheme.onPrimaryContainer),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
                   DateTimeUtils.hms(next.remaining(_now)),
-                  style: theme.textTheme.displayLarge?.copyWith(color: scheme.onPrimaryContainer),
+                  style: theme.textTheme.displayLarge
+                      ?.copyWith(color: scheme.onPrimaryContainer),
                 ),
                 Text(
                   'lagi',
-                  style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onPrimaryContainer),
+                  style: theme.textTheme.bodyMedium
+                      ?.copyWith(color: scheme.onPrimaryContainer),
                 ),
               ],
             ),

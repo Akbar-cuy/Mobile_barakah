@@ -11,16 +11,20 @@ import '../repository/feedback_repository.dart';
 final feedbackRepositoryProvider = Provider<FeedbackRepository>((ref) {
   return FeedbackRepository(
     db: ref.watch(appDatabaseProvider),
-    api: ref.watch(apiGatewayProvider),
     outbox: ref.watch(outboxDaoProvider),
   );
 });
 
 final feedbackListProvider = StreamProvider<List<FeedbackEntry>>((ref) {
   final repository = ref.watch(feedbackRepositoryProvider);
-  final sub = ref.watch(syncServiceProvider).statusStream.listen((status) {
-    if (status == SyncStatus.synced) unawaited(repository.markPendingSynced());
+  final subscription =
+      ref.watch(syncServiceProvider).statusStream.listen((status) {
+    if (status == SyncStatus.synced) {
+      unawaited(repository.markPendingSynced());
+    } else if (status == SyncStatus.error) {
+      unawaited(repository.markDeadLettersFailed());
+    }
   });
-  ref.onDispose(sub.cancel);
+  ref.onDispose(subscription.cancel);
   return repository.watchAll();
 });

@@ -50,13 +50,21 @@ class AladhanPrayerTimeService implements PrayerTimeSource {
     required String locationKey,
   }) async {
     try {
-      final res = await _dio.get<Object?>(
+      final response = await _dio.get<Object?>(
         '/v1/calendar/$year/$month',
         queryParameters: {'latitude': lat, 'longitude': lon, 'method': method},
       );
-      return parse(res.data, lat: lat, lon: lon, method: method, locationKey: locationKey);
-    } on DioException catch (e) {
-      throw PrayerFetchException(e.message ?? 'Gagal mengambil jadwal sholat.');
+      return parse(
+        response.data,
+        lat: lat,
+        lon: lon,
+        method: method,
+        locationKey: locationKey,
+      );
+    } on DioException catch (error) {
+      throw PrayerFetchException(
+        error.message ?? 'Gagal mengambil jadwal sholat.',
+      );
     }
   }
 
@@ -88,8 +96,10 @@ class AladhanPrayerTimeService implements PrayerTimeSource {
           TimezoneService.offsetForZoneName(zone, DateTime(year, month, day));
 
       String? hm(String key) {
-        final m = _hm.firstMatch(timings[key]?.toString() ?? '');
-        return m == null ? null : '${m.group(1)!.padLeft(2, '0')}:${m.group(2)}';
+        final match = _hm.firstMatch(timings[key]?.toString() ?? '');
+        return match == null
+            ? null
+            : '${match.group(1)!.padLeft(2, '0')}:${match.group(2)}';
       }
 
       final times = {
@@ -100,14 +110,14 @@ class AladhanPrayerTimeService implements PrayerTimeSource {
         PrayerName.maghrib: hm('Maghrib'),
         PrayerName.isha: hm('Isha'),
       };
-      if (times.values.any((v) => v == null)) continue;
+      if (times.values.any((value) => value == null)) continue;
 
       days.add(
         PrayerTimes(
           date: '${year.toString().padLeft(4, '0')}-'
               '${month.toString().padLeft(2, '0')}-'
               '${day.toString().padLeft(2, '0')}',
-          times: {for (final e in times.entries) e.key: e.value!},
+          times: {for (final entry in times.entries) entry.key: entry.value!},
           utcOffsetMinutes: offset,
           lat: lat,
           lon: lon,
@@ -144,7 +154,9 @@ abstract final class PrayerCalculator {
     for (final day in sorted) {
       for (final prayer in PrayerName.obligatory) {
         final at = day.instant(prayer);
-        if (at.isAfter(nowUtc)) return NextPrayer(name: prayer, at: at, day: day);
+        if (at.isAfter(nowUtc)) {
+          return NextPrayer(name: prayer, at: at, day: day);
+        }
       }
     }
     return null;
@@ -154,7 +166,9 @@ abstract final class PrayerCalculator {
   /// memakai hari pertama.
   static PrayerTimes? today(List<PrayerTimes> days, DateTime nowUtc) {
     for (final day in days) {
-      final local = nowUtc.toUtc().add(Duration(minutes: day.utcOffsetMinutes));
+      final local = nowUtc.toUtc().add(
+            Duration(minutes: day.utcOffsetMinutes),
+          );
       final key = '${local.year.toString().padLeft(4, '0')}-'
           '${local.month.toString().padLeft(2, '0')}-'
           '${local.day.toString().padLeft(2, '0')}';

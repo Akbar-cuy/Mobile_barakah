@@ -24,7 +24,15 @@ import '../widgets/zone_chips.dart';
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
-  static const _days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+  static const _days = [
+    'Senin',
+    'Selasa',
+    'Rabu',
+    'Kamis',
+    'Jumat',
+    'Sabtu',
+    'Minggu',
+  ];
 
   static String _issueText(LocationIssue issue) => switch (issue) {
         LocationIssue.serviceOff =>
@@ -46,7 +54,8 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(user == null ? 'Beranda' : 'Assalamualaikum, ${user.firstName}'),
+        title: Text(
+            user == null ? 'Beranda' : 'Assalamualaikum, ${user.firstName}'),
         actions: [
           IconButton(
             tooltip: 'Pengingat adzan',
@@ -66,7 +75,8 @@ class HomeScreen extends ConsumerWidget {
         ),
         data: (state) => RefreshIndicator(
           onRefresh: () async {
-            await ref.refresh(homeProvider.future);
+            ref.invalidate(homeProvider);
+            await ref.read(homeProvider.future);
           },
           child: _HomeContent(state: state, zone: zone),
         ),
@@ -94,8 +104,10 @@ class _HomeContent extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(AppSpacing.page),
       children: [
-        Text(HomeScreen.dateLabel(DateTime.now()),
-            style: Theme.of(context).textTheme.bodyMedium),
+        Text(
+          HomeScreen.dateLabel(DateTime.now()),
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
         const SizedBox(height: AppSpacing.md),
         if (state.locationIssue != null) ...[
           StatusBanner(
@@ -124,7 +136,11 @@ class _HomeContent extends StatelessWidget {
             PrayerRow(
               name: prayer.label,
               time: DateTimeUtils.hm(
-                TimezoneService.wallClock(zone, today.instant(prayer), today.utcOffsetMinutes),
+                TimezoneService.wallClock(
+                  zone,
+                  today.instant(prayer),
+                  today.utcOffsetMinutes,
+                ),
               ),
               highlighted: next != null &&
                   next.day.date == today.date &&

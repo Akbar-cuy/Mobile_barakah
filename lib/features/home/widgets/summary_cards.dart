@@ -1,4 +1,4 @@
-// M4 Beranda. Ringkasan lokasi dan status pengingat adzan.
+// M4 Beranda: ringkasan lokasi dan status pengingat adzan.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -27,7 +27,7 @@ class SummaryCards extends ConsumerWidget {
           child: _Card(
             icon: Icons.place_outlined,
             title: 'Lokasi',
-            value: location.isDefault ? 'Jakarta (bawaan)' : location.toString(),
+            value: location.isDefault ? 'Jakarta (bawaan)' : location.city,
           ),
         ),
         const SizedBox(width: AppSpacing.md),
@@ -45,7 +45,12 @@ class SummaryCards extends ConsumerWidget {
 }
 
 class _Card extends StatelessWidget {
-  const _Card({required this.icon, required this.title, required this.value, this.onTap});
+  const _Card({
+    required this.icon,
+    required this.title,
+    required this.value,
+    this.onTap,
+  });
 
   final IconData icon;
   final String title;
