@@ -1,6 +1,6 @@
 // M2 Manajemen Session (FR-SES)
 import 'dart:async';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers/app_providers.dart';
@@ -27,9 +27,23 @@ class SessionController extends Notifier<SessionState> {
   SessionService get _service => ref.read(sessionServiceProvider);
 
   Future<void> bootstrap() async {
-    state = await _service.bootstrap();
+  try {
+    // Berikan batas waktu maksimal 3 detik untuk proses bootstrap
+    state = await _service.bootstrap().timeout(
+      const Duration(seconds: 3),
+      onTimeout: () {
+        debugPrint('Bootstrap timeout: Mengalihkan ke unauthenticated.');
+        return const SessionState.unauthenticated();
+      },
+    );
+  } catch (e, st) {
+    debugPrint('Error saat bootstrap session: $e\n$st');
+    // Jika terjadi kegagalan/error, paksa status ke unauthenticated
+    state = const SessionState.unauthenticated();
+  } finally {
     _updateSync();
   }
+}
 
   Future<void> login(String identifier, String password) async {
     state = await _service.login(identifier, password);

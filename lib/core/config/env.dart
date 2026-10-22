@@ -1,25 +1,30 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 abstract final class Env {
-  /// dev, staging, atau prod. Nilai lain dianggap dev oleh AppConfig.
-  static const String appEnv =
-      String.fromEnvironment('APP_ENV', defaultValue: 'dev');
+  /// dev, staging, atau prod.
+  static String get appEnv => dotenv.env['APP_ENV'] ?? 'dev';
 
-  static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL');
+  static String get supabaseUrl =>
+      dotenv.env['SUPABASE_URL'] ?? '';
 
-  static const String supabaseAnonKey =
-      String.fromEnvironment('SUPABASE_ANON_KEY');
+  static String get supabaseAnonKey =>
+      dotenv.env['SUPABASE_ANON_KEY'] ?? '';
 
   /// M21 IoT (opsional).
-  static const bool enableIot = bool.fromEnvironment('ENABLE_IOT');
+  static bool get enableIot =>
+      dotenv.env['ENABLE_IOT']?.toLowerCase() == 'true';
 
-  /// FR-NTF-08, notifikasi dekat masjid (opsional).
-  static const bool enableGeofence = bool.fromEnvironment('ENABLE_GEOFENCE');
+  /// FR NTF 08, notifikasi dekat masjid (opsional).
+  static bool get enableGeofence =>
+      dotenv.env['ENABLE_GEOFENCE']?.toLowerCase() == 'true';
 
-  /// Ringkasan yang aman dicetak ke log untuk memeriksa konfigurasi.
-  /// Nilai kunci tidak ditampilkan, hanya status terisi atau kosong.
+  /// Ringkasan yang aman dicetak ke log.
   static Map<String, String> get summary => {
         'APP_ENV': appEnv,
-        'SUPABASE_URL': supabaseUrl.isEmpty ? '(kosong)' : supabaseUrl,
-        'SUPABASE_ANON_KEY': supabaseAnonKey.isEmpty ? '(kosong)' : '(terisi)',
+        'SUPABASE_URL':
+            supabaseUrl.isEmpty ? '(kosong)' : supabaseUrl,
+        'SUPABASE_ANON_KEY':
+            supabaseAnonKey.isEmpty ? '(kosong)' : '(terisi)',
         'ENABLE_IOT': '$enableIot',
         'ENABLE_GEOFENCE': '$enableGeofence',
       };

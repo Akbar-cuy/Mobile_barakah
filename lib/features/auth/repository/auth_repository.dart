@@ -114,7 +114,7 @@ class ApiAuthRepository implements AuthRepository {
         'device_id': deviceId,
         'device_token': token,
       });
-      return _startSession(res);
+      return await _startSession(res);
     } on ApiException catch (e) {
       if (e.kind == ApiErrorKind.unauthorized) {
         await storage.delete(SecureKeys.deviceToken);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
@@ -10,8 +11,16 @@ import 'core/security/encryption_service.dart';
 import 'core/security/secure_storage_service.dart';
 import 'features/notification/providers/notification_provider.dart';
 
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint('Gagal memuat file .env: $e');
+  }
+
   debugPrint('Konfigurasi: ${Env.summary}');
 
   final storage = SecureStorageService();

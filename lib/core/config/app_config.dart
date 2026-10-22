@@ -16,8 +16,8 @@ abstract final class AppConfig {
 
   // ------------------------------------------------------------------- Backend
 
-  static const String supabaseUrl = Env.supabaseUrl;
-  static const String supabaseAnonKey = Env.supabaseAnonKey;
+static String get supabaseUrl => Env.supabaseUrl;
+static String get supabaseAnonKey => Env.supabaseAnonKey;
 
   static bool get isBackendConfigured =>
       supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
@@ -55,10 +55,10 @@ abstract final class AppConfig {
   // ---------------------------------------------------------- Penanda fitur
 
   /// M21 IoT bersifat opsional: --dart-define=ENABLE_IOT=true
-  static const bool enableIot = Env.enableIot;
+  static bool get enableIot => Env.enableIot;
 
   /// FR-NTF-08 (opsional): --dart-define=ENABLE_GEOFENCE=true
-  static const bool enableGeofenceNotification = Env.enableGeofence;
+  static bool get enableGeofenceNotification => Env.enableGeofence;
 
   // ------------------------------------------------- Lokasi dan jadwal (M4, M6)
 
