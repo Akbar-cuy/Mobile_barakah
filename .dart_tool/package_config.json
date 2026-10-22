@@ -176,6 +176,12 @@
       "languageVersion": "3.11"
     },
     {
+      "name": "flutter_compass",
+      "rootUri": "file:///C:/Users/acer/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_compass-0.8.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "flutter_lints",
       "rootUri": "file:///C:/Users/acer/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_lints-5.0.0",
       "packageUri": "lib/",
@@ -558,6 +564,18 @@
       "rootUri": "file:///C:/Users/acer/AppData/Local/Pub/Cache/hosted/pub.dev/riverpod-3.4.3",
       "packageUri": "lib/",
       "languageVersion": "3.12"
+    },
+    {
+      "name": "sensors_plus",
+      "rootUri": "file:///C:/Users/acer/AppData/Local/Pub/Cache/hosted/pub.dev/sensors_plus-7.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "sensors_plus_platform_interface",
+      "rootUri": "file:///C:/Users/acer/AppData/Local/Pub/Cache/hosted/pub.dev/sensors_plus_platform_interface-2.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
     },
     {
       "name": "shared_preferences",

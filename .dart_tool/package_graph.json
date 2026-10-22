@@ -10,6 +10,7 @@
         "crypto",
         "drift",
         "flutter",
+        "flutter_compass",
         "flutter_local_notifications",
         "flutter_riverpod",
         "geocoding",
@@ -17,6 +18,7 @@
         "http",
         "permission_handler",
         "provider",
+        "sensors_plus",
         "shared_preferences",
         "timezone"
       ],
@@ -141,6 +143,15 @@
       ]
     },
     {
+      "name": "sensors_plus",
+      "version": "7.1.1",
+      "dependencies": [
+        "flutter",
+        "flutter_web_plugins",
+        "sensors_plus_platform_interface"
+      ]
+    },
+    {
       "name": "provider",
       "version": "6.1.5+1",
       "dependencies": [
@@ -217,6 +228,13 @@
         "flutter_local_notifications_web",
         "flutter_local_notifications_windows",
         "timezone"
+      ]
+    },
+    {
+      "name": "flutter_compass",
+      "version": "0.8.1",
+      "dependencies": [
+        "flutter"
       ]
     },
     {
@@ -729,6 +747,23 @@
       ]
     },
     {
+      "name": "sensors_plus_platform_interface",
+      "version": "2.0.2",
+      "dependencies": [
+        "flutter",
+        "logging",
+        "meta",
+        "plugin_platform_interface"
+      ]
+    },
+    {
+      "name": "flutter_web_plugins",
+      "version": "0.0.0",
+      "dependencies": [
+        "flutter"
+      ]
+    },
+    {
       "name": "nested",
       "version": "1.0.0",
       "dependencies": [
@@ -1093,13 +1128,6 @@
         "flutter",
         "platform",
         "plugin_platform_interface"
-      ]
-    },
-    {
-      "name": "flutter_web_plugins",
-      "version": "0.0.0",
-      "dependencies": [
-        "flutter"
       ]
     },
     {
