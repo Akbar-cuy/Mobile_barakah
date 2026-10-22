@@ -1,9 +1,40 @@
+// Satu baris jadwal sholat, contoh: "Dzuhur ........ 11:45 WIB".
+// Kalau isNext = true, baris diberi warna dan huruf tebal.
+
 import 'package:flutter/material.dart';
 
-// M4 Beranda dan Jadwal Sholat (FR-LBS-01 sampai 08), M9 zona tampilan (FR-TZ)
 class PrayerRow extends StatelessWidget {
-  const PrayerRow({super.key});
+  final String name;
+  final String time;
+  final bool isNext;
+
+  const PrayerRow({
+    super.key,
+    required this.name,
+    required this.time,
+    this.isNext = false,
+  });
 
   @override
-  Widget build(BuildContext context) => const SizedBox.shrink();
+  Widget build(BuildContext context) {
+    final style = TextStyle(
+      fontWeight: isNext ? FontWeight.bold : FontWeight.normal,
+    );
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isNext ? Colors.grey.shade200 : null,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(name, style: style),
+          Text(time, style: style),
+        ],
+      ),
+    );
+  }
 }

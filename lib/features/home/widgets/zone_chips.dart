@@ -1,9 +1,30 @@
+// Pilihan zona waktu: WIB, WITA, WIT, London.
+
 import 'package:flutter/material.dart';
 
-// M4 Beranda dan Jadwal Sholat (FR-LBS-01 sampai 08), M9 zona tampilan (FR-TZ)
 class ZoneChips extends StatelessWidget {
-  const ZoneChips({super.key});
+  final List<String> zones; // daftar nama zona
+  final String selectedZone; // zona yang sedang dipilih
+  final Function(String) onSelected; // dipanggil saat chip ditekan
+
+  const ZoneChips({
+    super.key,
+    required this.zones,
+    required this.selectedZone,
+    required this.onSelected,
+  });
 
   @override
-  Widget build(BuildContext context) => const SizedBox.shrink();
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      children: zones.map((zone) {
+        return ChoiceChip(
+          label: Text(zone),
+          selected: selectedZone == zone,
+          onSelected: (_) => onSelected(zone),
+        );
+      }).toList(),
+    );
+  }
 }
