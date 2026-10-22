@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers/app_providers.dart';
 import '../models/session.dart';
+import '../models/user.dart';
 import '../services/auto_lock_service.dart';
 import '../services/session_service.dart';
 import 'auth_provider.dart';
@@ -53,6 +54,12 @@ class SessionController extends Notifier<SessionState> {
 
   Future<void> lock() async {
     state = await _service.lock(state);
+  }
+
+  /// Memperbarui data pengguna di sesi setelah profil diubah (M17).
+  void updateUser(AppUser user) {
+    if (state.user == null) return;
+    state = state.copyWith(user: user);
   }
 
   /// Dari layar kunci: pindah ke login kata sandi tanpa menghapus token.
