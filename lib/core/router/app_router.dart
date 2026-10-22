@@ -11,7 +11,11 @@ import '../../features/auth/screens/splash_screen.dart';
 import '../../features/feedback/screens/feedback_screen.dart';
 import '../../features/home/screens/home_screen.dart';
 import '../../features/notification/screens/notification_settings_screen.dart';
+import '../../features/profile/screens/change_password_screen.dart';
+import '../../features/profile/screens/edit_profile_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
+import '../../features/profile/screens/security_screen.dart';
+import '../../features/profile/screens/settings_screen.dart';
 import '../../features/shell/screens/main_shell.dart';
 import '../../features/worship/screens/worship_hub_screen.dart';
 import 'route_names.dart';
@@ -65,6 +69,22 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteNames.notificationSettings,
         builder: (_, __) => const NotificationSettingsScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.editProfile,
+        builder: (_, __) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.changePassword,
+        builder: (_, __) => const ChangePasswordScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.security,
+        builder: (_, __) => const SecurityScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.settings,
+        builder: (_, __) => const SettingsScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => MainShell(navigationShell: shell),

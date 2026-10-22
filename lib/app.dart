@@ -5,6 +5,7 @@ import 'core/config/app_config.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/providers/session_provider.dart';
+import 'features/profile/providers/theme_provider.dart';
 
 class BarakahApp extends ConsumerWidget {
   const BarakahApp({super.key});
@@ -17,7 +18,7 @@ class BarakahApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.system,
+      themeMode: ref.watch(themeModeProvider),
       routerConfig: ref.watch(routerProvider),
     );
   }

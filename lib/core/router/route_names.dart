@@ -8,4 +8,8 @@ abstract final class RouteNames {
   static const profile = '/profil';
   static const feedback = '/saran';
   static const notificationSettings = '/pengingat-adzan';
+  static const editProfile = '/profil/ubah';
+  static const changePassword = '/profil/kata-sandi';
+  static const security = '/profil/keamanan';
+  static const settings = '/profil/pengaturan';
 }

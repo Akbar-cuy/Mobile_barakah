@@ -8,6 +8,7 @@ import 'core/database/database_opener.dart';
 import 'core/providers/app_providers.dart';
 import 'core/security/encryption_service.dart';
 import 'core/security/secure_storage_service.dart';
+import 'features/notification/providers/notification_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,10 +25,13 @@ Future<void> main() async {
     ],
   );
 
-  runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const BarakahApp(),
-    ),
-  );
+  try {
+    await container.read(notificationServiceProvider).init();
+    final settings = await container.read(notificationSettingsStoreProvider).load();
+    await container.read(prayerSchedulerProvider).reschedule(settings);
+  } catch (e) {
+    debugPrint('Notifikasi belum siap: $e');
+  }
+
+  runApp(UncontrolledProviderScope(container: container, child: const BarakahApp()));
 }

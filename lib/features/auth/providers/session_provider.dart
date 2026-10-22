@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers/app_providers.dart';
 import '../models/session.dart';
+import '../models/user.dart';
 import '../services/auto_lock_service.dart';
 import '../services/session_service.dart';
 import 'auth_provider.dart';
@@ -59,6 +60,11 @@ class SessionController extends Notifier<SessionState> {
   void usePassword() {
     state = const SessionState.unauthenticated();
     _updateSync();
+  }
+
+  /// Memperbarui data pengguna di sesi setelah profil diubah (FR-PRO-03).
+  void updateUser(AppUser user) {
+    state = state.copyWith(user: user);
   }
 
   Future<bool> enableBiometric(String password) {
