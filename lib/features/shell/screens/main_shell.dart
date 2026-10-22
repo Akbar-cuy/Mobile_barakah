@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../auth/providers/session_provider.dart';
 import '../../auth/widgets/biometric_offer_dialog.dart';
 import '../../auth/widgets/logout_dialog.dart';
+import '../../ledger/providers/ledger_provider.dart';
+import '../../notification/providers/notification_provider.dart';
 import '../widgets/app_bottom_nav.dart';
 
 class MainShell extends ConsumerStatefulWidget {
@@ -37,6 +39,9 @@ class _MainShellState extends ConsumerState<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    // Layanan latar yang hidup selama pengguna berada di shell.
+    ref.watch(ledgerConflictWatcherProvider);
+    ref.watch(notificationRescheduleWatcherProvider);
     final shell = widget.navigationShell;
     return Scaffold(
       body: shell,
