@@ -85,6 +85,10 @@ class OutboxProcessor {
         final block = payload['block'];
         final idx = block is Map ? block['idx'] : null;
         if (idx is int) await ledger.markSynced(idx);
+        // Blok genesis ikut terkirim bersama donasi pertama (M12).
+        final genesis = payload['genesis'];
+        final genesisIdx = genesis is Map ? genesis['idx'] : null;
+        if (genesisIdx is int) await ledger.markSynced(genesisIdx);
       case OutboxEntity.feedback:
         await _sendFeedback(item.op, payload);
       case OutboxEntity.favoriteMosque:

@@ -11,6 +11,7 @@ import '../../auth/providers/session_provider.dart';
 import '../services/notification_prefs.dart';
 import '../services/notification_service.dart';
 import '../services/prayer_scheduler.dart';
+import 'package:drift/drift.dart';
 
 final notificationGatewayProvider = Provider<NotificationGateway>(
   (ref) => FlutterLocalNotificationsGateway(),

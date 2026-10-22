@@ -609,7 +609,7 @@ class ApiLedgerRepository implements LedgerRepository {
 
   LedgerLocalTableCompanion _companion(Block b) {
     return LedgerLocalTableCompanion.insert(
-      idx: b.index,
+      idx: Value(b.index),
       timestamp: b.timestamp,
       donorAlias: b.donorAlias,
       campaign: b.campaign,

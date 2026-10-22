@@ -13,6 +13,10 @@ import '../security/encryption_service.dart';
 import '../security/secure_storage_service.dart';
 import '../sync/outbox_processor.dart';
 import '../sync/sync_service.dart';
+// Pull handler milik fitur didaftarkan di sini (FR-SYNC-03). Saling impor
+// dengan provider fitur aman karena provider diinisialisasi malas.
+import '../../features/profile/providers/theme_provider.dart';
+import '../../features/tasbih/providers/tasbih_provider.dart';
 
 // appDatabaseProvider di-override di main() setelah kunci enkripsi didapat.
 final secureStorageProvider =
@@ -77,8 +81,12 @@ final outboxProcessorProvider = Provider<OutboxProcessor>((ref) {
   );
 });
 
-final syncPullHandlersProvider =
-    Provider<List<SyncPullHandler>>((ref) => const []);
+final syncPullHandlersProvider = Provider<List<SyncPullHandler>>((ref) {
+  return [
+    ref.watch(tasbihPullHandlerProvider),
+    ref.watch(settingsPullHandlerProvider),
+  ];
+});
 
 final syncServiceProvider = Provider<SyncService>((ref) {
   final service = SyncService(
