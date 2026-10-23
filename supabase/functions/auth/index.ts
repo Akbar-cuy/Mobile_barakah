@@ -1,9 +1,10 @@
 
-import { serveRoutes } from "../_shared/router.ts";
+import { serveRoutes, type RouteContext } from "../_shared/router.ts";
 import {
   badRequest,
   errorResponse,
   json,
+  notFound,
   readJson,
   serverError,
   unauthorized,
@@ -15,6 +16,7 @@ import {
   randomToken,
   sha256Hex,
   signJwt,
+  verifyJwt,
 } from "../_shared/crypto.ts";
 
 const ACCESS_TOKEN_SECONDS = 900;
@@ -30,7 +32,87 @@ function getJwtSecret(): string {
   return secret;
 }
 
+async function authenticatedSession(req: Request) {
+  const authorization = req.headers.get("Authorization") ?? "";
+  const match = /^Bearer\s+(.+)$/i.exec(authorization);
+  if (!match) return null;
+
+  const claims = await verifyJwt(match[1], getJwtSecret());
+  const userId = claims?.sub;
+  const sessionId = claims?.sid;
+  if (typeof userId !== "string" || typeof sessionId !== "string") return null;
+
+  const db = getAdminClient();
+  const { data, error } = await db
+    .from("sessions")
+    .select("id, user_id, device_id, expires_at, revoked_at")
+    .eq("id", sessionId)
+    .eq("user_id", userId)
+    .is("revoked_at", null)
+    .gt("expires_at", new Date().toISOString())
+    .maybeSingle();
+
+  if (error) {
+    console.error("Session authentication lookup error:", error);
+    throw new Error("Session authentication lookup failed.");
+  }
+  if (!data) return null;
+
+  return { db, userId, sessionId };
+}
+
 const routes = {
+  "GET /auth/sessions": async (req: Request) => {
+    const auth = await authenticatedSession(req);
+    if (!auth) return unauthorized();
+
+    const { data, error } = await auth.db
+      .from("sessions")
+      .select("id, device_id, created_at, expires_at")
+      .eq("user_id", auth.userId)
+      .is("revoked_at", null)
+      .gt("expires_at", new Date().toISOString())
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Active sessions lookup error:", error);
+      return serverError();
+    }
+
+    return json({
+      items: (data ?? []).map((session) => ({
+        id: session.id,
+        device: session.device_id,
+        last_seen_at: session.created_at,
+        current: session.id === auth.sessionId,
+      })),
+    });
+  },
+
+  "DELETE /auth/sessions/:id": async (req: Request, { params }: RouteContext) => {
+    const auth = await authenticatedSession(req);
+    if (!auth) return unauthorized();
+    if (params.id === auth.sessionId) {
+      return badRequest("Sesi perangkat ini tidak dapat dicabut dari sini.");
+    }
+
+    const { data, error } = await auth.db
+      .from("sessions")
+      .update({ revoked_at: new Date().toISOString() })
+      .eq("id", params.id)
+      .eq("user_id", auth.userId)
+      .is("revoked_at", null)
+      .select("id")
+      .maybeSingle();
+
+    if (error) {
+      console.error("Session revocation error:", error);
+      return serverError();
+    }
+    if (!data) return notFound("Sesi tidak ditemukan.");
+    return json({ ok: true });
+  },
+
   "POST /auth/register": async (req: Request) => {
     const body = await readJson<{
       name?: string;

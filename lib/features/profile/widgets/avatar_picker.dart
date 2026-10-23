@@ -1,4 +1,4 @@
-// M17 Profil (FR-PRO-01). Foto profil dari tautan, dengan inisial sebagai cadangan.
+// M17 Profil (FR-PRO-03). Foto tautan, dengan inisial sebagai cadangan.
 import 'package:flutter/material.dart';
 
 class AvatarPicker extends StatelessWidget {

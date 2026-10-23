@@ -1,21 +1,22 @@
-// M17 Profil (FR-PRO-05). Ubah kata sandi.
+// M17 Profil (FR-PRO-05).
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/network/api_exception.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/validators.dart';
 import '../../../shared/widgets/app_snackbar.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/primary_button.dart';
-import '../../auth/providers/auth_provider.dart';
+import '../../../shared/widgets/status_banner.dart';
+import '../providers/profile_provider.dart';
 
 class ChangePasswordScreen extends ConsumerStatefulWidget {
   const ChangePasswordScreen({super.key});
 
   @override
-  ConsumerState<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
+  ConsumerState<ChangePasswordScreen> createState() =>
+      _ChangePasswordScreenState();
 }
 
 class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
@@ -23,7 +24,14 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   final _old = TextEditingController();
   final _new = TextEditingController();
   final _confirm = TextEditingController();
-  bool _busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => ref.read(profileControllerProvider.notifier).clearError(),
+    );
+  }
 
   @override
   void dispose() {
@@ -33,31 +41,31 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     super.dispose();
   }
 
-  Future<void> _save() async {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _busy = true);
-    try {
-      await ref.read(authRepositoryProvider).changePassword(
-            oldPassword: _old.text,
-            newPassword: _new.text,
-          );
-      if (!mounted) return;
+    final ok = await ref.read(profileControllerProvider.notifier).changePassword(
+          oldPassword: _old.text,
+          newPassword: _new.text,
+        );
+    if (!mounted) return;
+    if (ok) {
       showAppSnackBar(context, 'Kata sandi diperbarui.');
       context.pop();
-    } on ApiException catch (e) {
-      if (mounted) showAppSnackBar(context, e.message);
-    } finally {
-      if (mounted) setState(() => _busy = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final action = ref.watch(profileControllerProvider);
     return Scaffold(
       appBar: AppBar(title: const Text('Ubah Kata Sandi')),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.page),
         children: [
+          if (action.error != null) ...[
+            StatusBanner(kind: BannerKind.error, message: action.error!),
+            const SizedBox(height: AppSpacing.md),
+          ],
           Form(
             key: _formKey,
             child: Column(
@@ -68,7 +76,8 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   icon: Icons.lock_outline,
                   obscure: true,
                   textInputAction: TextInputAction.next,
-                  validator: (v) => Validators.required(v, field: 'Kata sandi lama'),
+                  validator: (value) =>
+                      Validators.required(value, field: 'Kata sandi lama'),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 AppTextField(
@@ -77,7 +86,13 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   icon: Icons.lock_reset,
                   obscure: true,
                   textInputAction: TextInputAction.next,
-                  validator: Validators.password,
+                  validator: (value) {
+                    final error = Validators.password(value);
+                    if (error != null) return error;
+                    return value == _old.text
+                        ? 'Kata sandi baru harus berbeda dari yang lama.'
+                        : null;
+                  },
                 ),
                 const SizedBox(height: AppSpacing.md),
                 AppTextField(
@@ -85,12 +100,18 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   hint: 'Ulangi kata sandi baru',
                   icon: Icons.lock_reset,
                   obscure: true,
-                  validator: (v) => Validators.confirmPassword(v, _new.text),
+                  validator: (value) =>
+                      Validators.confirmPassword(value, _new.text),
+                  onSubmitted: (_) => _submit(),
                 ),
-                const SizedBox(height: AppSpacing.xl),
-                PrimaryButton(label: 'Simpan', loading: _busy, onPressed: _save),
               ],
             ),
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          PrimaryButton(
+            label: 'Simpan',
+            loading: action.busy,
+            onPressed: _submit,
           ),
         ],
       ),

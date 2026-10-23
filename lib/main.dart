@@ -34,10 +34,7 @@ Future<void> main() async {
   );
 
   try {
-    await container.read(notificationServiceProvider).init();
-    final settings =
-        await container.read(notificationSettingsStoreProvider).load();
-    await container.read(prayerSchedulerProvider).reschedule(settings);
+    await container.read(notificationGatewayProvider).init();
   } catch (error) {
     debugPrint('Notifikasi belum siap: $error');
   }

@@ -11,7 +11,6 @@ import '../../../shared/widgets/skeleton_box.dart';
 import '../../../shared/widgets/status_banner.dart';
 import '../../auth/providers/session_provider.dart';
 import '../../converter/services/timezone_service.dart';
-import '../../notification/providers/notification_provider.dart';
 import '../models/prayer_times.dart';
 import '../providers/home_provider.dart';
 import '../services/location_service.dart';
@@ -47,7 +46,6 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(prayerAutoScheduleProvider);
     final home = ref.watch(homeProvider);
     final zone = ref.watch(zoneProvider);
     final user = ref.watch(sessionProvider).user;

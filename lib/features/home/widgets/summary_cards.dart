@@ -15,12 +15,11 @@ class SummaryCards extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final reminder = ref.watch(notificationSettingsProvider).value;
-    final reminderText = reminder == null
-        ? 'Memuat'
-        : reminder.enabled
-            ? 'Aktif, ${reminder.prayers.length} sholat'
-            : 'Mati';
+    final reminder = ref.watch(notificationPrefsProvider);
+    final enabledCount =
+        reminder.enabled.values.where((enabled) => enabled).length;
+    final reminderText =
+        enabledCount == 0 ? 'Mati' : 'Aktif, $enabledCount sholat';
     return Row(
       children: [
         Expanded(

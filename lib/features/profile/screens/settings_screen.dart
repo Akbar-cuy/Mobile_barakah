@@ -1,4 +1,4 @@
-// M17 Profil (FR-PRO-07). Pengaturan: tema dan sinkronisasi.
+// M17 Profil (FR-PRO-07, FR-PRO-08).
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -22,6 +22,7 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final mode = ref.watch(themeModeProvider);
     final status = ref.watch(syncStatusProvider).value;
 
@@ -30,27 +31,40 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.page),
         children: [
-          Text('Tema', style: Theme.of(context).textTheme.titleSmall),
+          Text('Tema', style: theme.textTheme.titleSmall),
           const SizedBox(height: AppSpacing.sm),
           SegmentedButton<ThemeMode>(
             segments: const [
-              ButtonSegment(value: ThemeMode.system, label: Text('Sistem')),
-              ButtonSegment(value: ThemeMode.light, label: Text('Terang')),
-              ButtonSegment(value: ThemeMode.dark, label: Text('Gelap')),
+              ButtonSegment(
+                value: ThemeMode.system,
+                icon: Icon(Icons.brightness_auto),
+                label: Text('Sistem'),
+              ),
+              ButtonSegment(
+                value: ThemeMode.light,
+                icon: Icon(Icons.light_mode),
+                label: Text('Terang'),
+              ),
+              ButtonSegment(
+                value: ThemeMode.dark,
+                icon: Icon(Icons.dark_mode),
+                label: Text('Gelap'),
+              ),
             ],
             selected: {mode},
-            onSelectionChanged: (s) =>
-                ref.read(themeModeProvider.notifier).select(s.first),
+            onSelectionChanged: (selection) =>
+                ref.read(themeModeProvider.notifier).set(selection.first),
           ),
           const SizedBox(height: AppSpacing.xl),
-          Text('Sinkronisasi', style: Theme.of(context).textTheme.titleSmall),
+          Text('Sinkronisasi', style: theme.textTheme.titleSmall),
           const SizedBox(height: AppSpacing.sm),
           Text(_statusText(status)),
           const SizedBox(height: AppSpacing.sm),
           Align(
             alignment: Alignment.centerLeft,
             child: FilledButton.tonalIcon(
-              onPressed: () => ref.read(syncServiceProvider).syncNow(manual: true),
+              onPressed: () =>
+                  ref.read(syncServiceProvider).syncNow(manual: true),
               icon: const Icon(Icons.sync),
               label: const Text('Sinkronkan sekarang'),
             ),

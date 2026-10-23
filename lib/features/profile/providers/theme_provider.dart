@@ -1,34 +1,49 @@
-// M17 Profil, bagian Pengaturan (FR-PRO-07). Mode tema.
-import 'dart:async';
-
+// M17 Profil (FR-PRO-07). Tema ikut tersinkron antar perangkat.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers/app_providers.dart';
+import '../repository/synced_settings.dart';
 
-class ThemeModeNotifier extends Notifier<ThemeMode> {
-  static const _key = 'theme_mode';
+final syncedSettingsProvider = Provider<SyncedSettings>((ref) {
+  return SyncedSettings(
+    settings: ref.watch(settingsDaoProvider),
+    outbox: ref.watch(outboxDaoProvider),
+  );
+});
 
-  @override
-  ThemeMode build() {
-    unawaited(_load());
-    return ThemeMode.system;
-  }
+final settingsPullHandlerProvider = Provider<SettingsPullHandler>(
+  (ref) => SettingsPullHandler(ref.watch(syncedSettingsProvider)),
+);
 
-  Future<void> _load() async {
-    final value = await ref.read(settingsDaoProvider).get(_key);
-    state = switch (value) {
+ThemeMode themeModeFromId(String? id) => switch (id) {
       'light' => ThemeMode.light,
       'dark' => ThemeMode.dark,
       _ => ThemeMode.system,
     };
+
+String themeModeId(ThemeMode mode) => switch (mode) {
+      ThemeMode.light => 'light',
+      ThemeMode.dark => 'dark',
+      ThemeMode.system => 'system',
+    };
+
+class ThemeModeController extends Notifier<ThemeMode> {
+  @override
+  ThemeMode build() {
+    final subscription = ref
+        .read(settingsDaoProvider)
+        .watch(SyncedKeys.theme)
+        .listen((value) => state = themeModeFromId(value));
+    ref.onDispose(subscription.cancel);
+    return ThemeMode.system;
   }
 
-  Future<void> select(ThemeMode mode) async {
+  Future<void> set(ThemeMode mode) async {
     state = mode;
-    await ref.read(settingsDaoProvider).set(_key, mode.name);
+    await ref.read(syncedSettingsProvider).set(SyncedKeys.theme, themeModeId(mode));
   }
 }
 
 final themeModeProvider =
-    NotifierProvider<ThemeModeNotifier, ThemeMode>(ThemeModeNotifier.new);
+    NotifierProvider<ThemeModeController, ThemeMode>(ThemeModeController.new);
