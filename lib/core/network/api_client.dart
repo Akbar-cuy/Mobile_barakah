@@ -31,7 +31,11 @@ class ApiClient implements ApiGateway {
                 baseUrl: AppConfig.apiBaseUrl,
                 connectTimeout: AppConfig.connectTimeout,
                 receiveTimeout: AppConfig.receiveTimeout,
-                headers: {'Accept': 'application/json'},
+                headers: {
+                  'Accept': 'application/json',
+                  if (AppConfig.supabaseAnonKey.isNotEmpty)
+                    'apikey': AppConfig.supabaseAnonKey,
+                },
               ),
             ) {
     _dio.interceptors.add(

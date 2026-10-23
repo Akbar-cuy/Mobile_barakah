@@ -1,0 +1,30 @@
+project_id = "vqbuqhqbqhvjixdsmckk"
+
+# Barakah uses application-signed session JWTs, not Supabase Auth JWTs.
+# Each function must validate the caller using _shared/auth.ts before data access.
+[functions.auth]
+verify_jwt = false
+
+[functions.profile]
+verify_jwt = false
+
+[functions.feedback]
+verify_jwt = false
+
+[functions.mosques]
+verify_jwt = false
+
+[functions.favorites]
+verify_jwt = false
+
+[functions.donations]
+verify_jwt = false
+
+[functions.ledger]
+verify_jwt = false
+
+[functions.sync]
+verify_jwt = false
+
+[functions.iot]
+verify_jwt = false

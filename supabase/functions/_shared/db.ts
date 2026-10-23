@@ -1,5 +1,5 @@
 // Klien basis data dengan peran service. Hanya dipakai di dalam Edge Function.
-import { createClient, SupabaseClient } from "npm:@supabase/supabase-js@2";
+import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
 
 let client: SupabaseClient | null = null;
 

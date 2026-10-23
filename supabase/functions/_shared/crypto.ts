@@ -77,12 +77,21 @@ export async function verifyPassword(
   password: string,
   stored: string,
 ): Promise<boolean> {
-  const [scheme, algo, iter, salt, hash] = stored.split("$");
-  if (scheme !== "pbkdf2" || algo !== "sha256") return false;
-  const iterations = Number(iter);
-  if (!Number.isInteger(iterations) || iterations < 1) return false;
-  const actual = await derive(password, fromB64(salt), iterations);
-  return timingSafeEqual(actual, fromB64(hash));
+  try {
+    const [scheme, algo, iter, saltText, hashText, ...extra] = stored.split("$");
+    if (scheme !== "pbkdf2" || algo !== "sha256" || extra.length !== 0) return false;
+    const iterations = Number(iter);
+    if (!Number.isInteger(iterations) || iterations < 100_000 || iterations > 1_000_000) {
+      return false;
+    }
+    const salt = fromB64(saltText);
+    const expected = fromB64(hashText);
+    if (salt.length !== 16 || expected.length !== 32) return false;
+    const actual = await derive(password, salt, iterations);
+    return timingSafeEqual(actual, expected);
+  } catch {
+    return false;
+  }
 }
 
 async function hmacKey(secret: string): Promise<CryptoKey> {
@@ -118,7 +127,7 @@ export async function verifyJwt(
   const [header, body, sig] = parts;
   try {
     const head = JSON.parse(new TextDecoder().decode(fromB64Url(header)));
-    if (head.alg !== "HS256") return null;
+    if (head.alg !== "HS256" || head.typ !== "JWT") return null;
     const ok = await crypto.subtle.verify(
       "HMAC",
       await hmacKey(secret),
@@ -127,7 +136,16 @@ export async function verifyJwt(
     );
     if (!ok) return null;
     const payload = JSON.parse(new TextDecoder().decode(fromB64Url(body)));
-    if (typeof payload.exp !== "number" || payload.exp * 1000 <= Date.now()) {
+    if (
+      payload === null ||
+      typeof payload !== "object" ||
+      Array.isArray(payload) ||
+      typeof payload.exp !== "number" ||
+      payload.exp * 1000 <= Date.now() ||
+      (typeof payload.nbf === "number" && payload.nbf * 1000 > Date.now()) ||
+      (typeof payload.iss === "string" && payload.iss !== "barakah") ||
+      (typeof payload.aud === "string" && payload.aud !== "barakah-app")
+    ) {
       return null;
     }
     return payload;

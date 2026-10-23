@@ -5,15 +5,17 @@ import { type RouteContext, serveRoutes } from "../_shared/router.ts";
 import { requireUser } from "../_shared/auth.ts";
 
 const COLUMNS = "id, rating, impression, suggestion, created_at, updated_at";
+const COLUMNS_WITH_OWNER =
+  "id, rating, impression, suggestion, created_at, updated_at, user_id";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 type Fields = { rating: number; impression: string; suggestion: string };
 
 function validate(b: Record<string, unknown>): Fields | Response {
-  const rating = Number(b.rating);
+  const rating = b.rating;
   const impression = typeof b.impression === "string" ? b.impression.trim() : "";
   const suggestion = typeof b.suggestion === "string" ? b.suggestion.trim() : "";
-  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+  if (typeof rating !== "number" || !Number.isInteger(rating) || rating < 1 || rating > 5) {
     return badRequest("Penilaian harus 1 sampai 5 bintang.", "invalid_rating");
   }
   if (impression.length < 10 || impression.length > 500) {
@@ -50,20 +52,25 @@ async function create(req: Request): Promise<Response> {
   const fields = validate(b);
   if (fields instanceof Response) return fields;
 
-  const existing = await db.from("feedback").select("id, user_id").eq("id", id).maybeSingle();
+  const existing = await db.from("feedback")
+    .select(COLUMNS_WITH_OWNER)
+    .eq("id", id)
+    .maybeSingle();
+  if (existing.error) throw new Error("Feedback id lookup failed.");
   if (existing.data) {
     if (existing.data.user_id !== auth.userId) {
       return errorResponse(409, "id_conflict", "Id sudah dipakai.");
     }
-    const { data, error } = await db
-      .from("feedback")
-      .update({ ...fields, updated_at: new Date().toISOString() })
-      .eq("id", id)
-      .eq("user_id", auth.userId)
-      .select(COLUMNS)
-      .single();
-    if (error) throw error;
-    return json({ item: data });
+    return json({
+      item: {
+        id: existing.data.id,
+        rating: existing.data.rating,
+        impression: existing.data.impression,
+        suggestion: existing.data.suggestion,
+        created_at: existing.data.created_at,
+        updated_at: existing.data.updated_at,
+      },
+    });
   }
 
   const { data, error } = await db
@@ -71,7 +78,27 @@ async function create(req: Request): Promise<Response> {
     .insert({ id, user_id: auth.userId, ...fields })
     .select(COLUMNS)
     .single();
-  if (error) throw error;
+  if (error?.code === "23505") {
+    const raced = await db.from("feedback")
+      .select(COLUMNS_WITH_OWNER)
+      .eq("id", id)
+      .maybeSingle();
+    if (raced.error) throw new Error("Feedback conflict lookup failed.");
+    if (raced.data?.user_id === auth.userId) {
+      return json({
+        item: {
+          id: raced.data.id,
+          rating: raced.data.rating,
+          impression: raced.data.impression,
+          suggestion: raced.data.suggestion,
+          created_at: raced.data.created_at,
+          updated_at: raced.data.updated_at,
+        },
+      });
+    }
+    if (raced.data) return errorResponse(409, "id_conflict", "Id sudah dipakai.");
+  }
+  if (error) throw new Error("Feedback insert failed.");
   return json({ item: data }, 201);
 }
 
@@ -79,6 +106,7 @@ async function update(req: Request, ctx: RouteContext): Promise<Response> {
   const db = getAdminClient();
   const auth = await requireUser(req, db);
   if (auth instanceof Response) return auth;
+  if (!UUID.test(ctx.params.id)) return badRequest("Id tidak valid.", "invalid_id");
 
   const fields = validate((await readJson<Record<string, unknown>>(req)) ?? {});
   if (fields instanceof Response) return fields;
@@ -99,6 +127,7 @@ async function remove(req: Request, ctx: RouteContext): Promise<Response> {
   const db = getAdminClient();
   const auth = await requireUser(req, db);
   if (auth instanceof Response) return auth;
+  if (!UUID.test(ctx.params.id)) return badRequest("Id tidak valid.", "invalid_id");
   const { data, error } = await db
     .from("feedback")
     .delete()
@@ -115,4 +144,4 @@ Deno.serve(serveRoutes({
   "POST /feedback": create,
   "PUT /feedback/:id": update,
   "DELETE /feedback/:id": remove,
-}));
+}, "feedback"));

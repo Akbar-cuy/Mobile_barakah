@@ -29,8 +29,8 @@ async function update(req: Request): Promise<Response> {
     : null;
 
   if (!name) return badRequest("Nama lengkap wajib diisi.", "invalid_name");
-  if (username.length < 3) {
-    return badRequest("Nama pengguna minimal 3 karakter.", "invalid_username");
+  if (username.length < 3 || username.length > 30) {
+    return badRequest("Nama pengguna harus 3 sampai 30 karakter.", "invalid_username");
   }
   if (avatar !== null && !/^https?:\/\/\S+$/i.test(avatar)) {
     return badRequest("Tautan foto harus diawali http atau https.", "invalid_avatar");
@@ -38,6 +38,7 @@ async function update(req: Request): Promise<Response> {
 
   const taken = await db.from("users").select("id").eq("username", username).neq("id", auth.userId)
     .maybeSingle();
+  if (taken.error) throw new Error("Username lookup failed.");
   if (taken.data) return errorResponse(409, "username_taken", "Nama pengguna sudah dipakai.");
 
   const { data, error } = await db
@@ -58,4 +59,4 @@ async function update(req: Request): Promise<Response> {
 Deno.serve(serveRoutes({
   "GET /profile": get,
   "PUT /profile": update,
-}));
+}, "profile"));

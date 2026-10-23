@@ -9,7 +9,8 @@ abstract final class ApiEndpoints {
   static const String logout = '/auth/logout'; // POST, user
   static const String changePassword = '/auth/password'; // POST, user
   static const String biometricEnable = '/auth/biometric/enable'; // POST, user
-  static const String biometricLogin = '/auth/biometric/login'; // POST, publik (device token)
+  static const String biometricLogin =
+      '/auth/biometric/login'; // POST, publik (device token)
   static const String biometricDisable = '/auth/biometric'; // DELETE, user
   static const String authSessions = '/auth/sessions'; // GET, user
 
@@ -25,7 +26,8 @@ abstract final class ApiEndpoints {
   // ------------------------------------------------- Masjid dan LBS (M6)
 
   static const String mosquesNearby = '/mosques/nearby'; // GET, user
-  static const String favoriteMosques = '/favorites/mosques'; // GET, POST, DELETE, user
+  static const String favoriteMosques =
+      '/favorites/mosques'; // GET, POST, DELETE, user
 
   // ---------------------------------------- Kurs, zakat, donasi (M10, M11)
 
@@ -68,6 +70,8 @@ abstract final class ApiEndpoints {
   // -------------------------------------------------------- IoT (M21)
 
   static const String iotDevices = '/iot/devices'; // POST, user
+  static String iotDevice(String id) =>
+      '/iot/devices/${Uri.encodeComponent(id)}'; // DELETE, user
 
   // Dua endpoint berikut dipanggil perangkat ESP32 dengan device key (bukan
   // token pengguna, FR-IOT-05). Aplikasi tidak memanggilnya, hanya dicatat
@@ -84,6 +88,7 @@ abstract final class ApiEndpoints {
     login,
     refresh,
     biometricLogin,
+    logout,
   };
 
   static bool isPublic(String path) => publicPaths.contains(_stripQuery(path));

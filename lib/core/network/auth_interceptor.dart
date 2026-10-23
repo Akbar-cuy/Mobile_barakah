@@ -21,6 +21,10 @@ class AuthInterceptor extends QueuedInterceptor {
                 baseUrl: AppConfig.apiBaseUrl,
                 connectTimeout: AppConfig.connectTimeout,
                 receiveTimeout: AppConfig.receiveTimeout,
+                headers: {
+                  if (AppConfig.supabaseAnonKey.isNotEmpty)
+                    'apikey': AppConfig.supabaseAnonKey,
+                },
               ),
             );
 

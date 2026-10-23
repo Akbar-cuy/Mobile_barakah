@@ -40,7 +40,8 @@ class ApiIotRepository implements IotRepository {
 
   @override
   Future<IotDevice> register(String name) async {
-    final res = await api.request('POST', ApiEndpoints.iotDevices, body: {'name': name});
+    final res = await api
+        .request('POST', ApiEndpoints.iotDevices, body: {'name': name});
     final device = IotDevice.fromResponse(res, name: name);
     final all = [...await devices(), device];
     await settings.set(_key, jsonEncode([for (final d in all) d.toJson()]));
@@ -49,7 +50,11 @@ class ApiIotRepository implements IotRepository {
 
   @override
   Future<void> forget(String id) async {
-    final all = [for (final d in await devices()) if (d.id != id) d];
+    await api.request('DELETE', ApiEndpoints.iotDevice(id));
+    final all = [
+      for (final d in await devices())
+        if (d.id != id) d
+    ];
     await settings.set(_key, jsonEncode([for (final d in all) d.toJson()]));
   }
 }
