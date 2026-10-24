@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,13 +14,23 @@ class SplashScreen extends ConsumerStatefulWidget {
 }
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
+  Timer? _bootstrapTimer;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Future<void>.delayed(const Duration(milliseconds: 900));
-      if (mounted) await ref.read(sessionProvider.notifier).bootstrap();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _bootstrapTimer = Timer(const Duration(milliseconds: 900), () {
+        if (mounted) unawaited(ref.read(sessionProvider.notifier).bootstrap());
+      });
     });
+  }
+
+  @override
+  void dispose() {
+    _bootstrapTimer?.cancel();
+    super.dispose();
   }
 
   @override
