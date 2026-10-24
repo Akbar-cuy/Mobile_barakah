@@ -32,6 +32,16 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
   final ScrollController _gulir = ScrollController();
 
   @override
+  void initState() {
+    super.initState();
+    // Kata kunci cari disimpan di provider, sedangkan kolom cari dibuat baru
+    // setiap layar dibuka. Reset supaya tampilan dan filter selalu sama.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) ref.read(chatProvider.notifier).cari('');
+    });
+  }
+
+  @override
   void dispose() {
     _inputController.dispose();
     _cariController.dispose();
@@ -117,6 +127,8 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
           IconButton(
             onPressed: chat.pesan.isEmpty ? null : _konfirmasiHapus,
             icon: const Icon(Icons.delete_outline),
+            color: _teks,
+            disabledColor: _garis,
             tooltip: 'Hapus riwayat',
           ),
         ],
@@ -154,8 +166,11 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
       child: TextField(
         controller: _cariController,
         onChanged: (kata) => ref.read(chatProvider.notifier).cari(kata),
+        style: const TextStyle(color: _teks),
+        cursorColor: _hijau,
         decoration: InputDecoration(
           hintText: 'Cari di riwayat',
+          hintStyle: const TextStyle(color: _teksSub),
           prefixIcon: const Icon(Icons.search, color: _teksSub),
           filled: true,
           fillColor: _putih,
@@ -214,7 +229,11 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
             const SizedBox(height: 12),
             Text(
               judul,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: _teks,
+              ),
             ),
             const SizedBox(height: 4),
             Text(
@@ -268,6 +287,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
           ),
           if (chat.adaYangGagal)
             TextButton(
+              style: TextButton.styleFrom(foregroundColor: _hijau),
               onPressed: chat.memuat
                   ? null
                   : () => ref.read(chatProvider.notifier).kirimUlang(),
@@ -301,8 +321,11 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
               maxLines: 4,
               textInputAction: TextInputAction.send,
               onSubmitted: (_) => _kirim(),
+              style: const TextStyle(color: _teks),
+              cursorColor: _hijau,
               decoration: InputDecoration(
                 hintText: 'Ketik pertanyaan',
+                hintStyle: const TextStyle(color: _teksSub),
                 counterText: '',
                 filled: true,
                 fillColor: _latar,
@@ -329,6 +352,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
               style: FilledButton.styleFrom(
                 backgroundColor: _tombol,
                 foregroundColor: Colors.white,
+                minimumSize: const Size(72, 48),
                 shape: const StadiumBorder(),
               ),
               child: const Text('Kirim'),

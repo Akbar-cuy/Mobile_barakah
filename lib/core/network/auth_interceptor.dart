@@ -77,8 +77,9 @@ class AuthInterceptor extends QueuedInterceptor {
     if (outcome.invalid) {
       await _tokens.clear();
       onSessionExpired?.call();
+      return handler.next(err);
     }
-    handler.next(err);
+    handler.next(outcome.error ?? err);
   }
 
   Future<void> _retry(
@@ -100,9 +101,12 @@ class AuthInterceptor extends QueuedInterceptor {
     }
   }
 
-  Future<({String? accessToken, bool invalid})> _refresh() async {
+  Future<({String? accessToken, bool invalid, DioException? error})>
+      _refresh() async {
     final refreshToken = await _tokens.readRefreshToken();
-    if (refreshToken == null) return (accessToken: null, invalid: true);
+    if (refreshToken == null) {
+      return (accessToken: null, invalid: true, error: null);
+    }
     try {
       final res = await _refreshDio.post<dynamic>(
         ApiEndpoints.refresh,
@@ -114,16 +118,20 @@ class AuthInterceptor extends QueuedInterceptor {
         final refresh = data['refresh_token']?.toString();
         if (access != null && refresh != null) {
           await _tokens.saveTokens(accessToken: access, refreshToken: refresh);
-          return (accessToken: access, invalid: false);
+          return (accessToken: access, invalid: false, error: null);
         }
       }
-      return (accessToken: null, invalid: true);
+      return (accessToken: null, invalid: true, error: null);
     } on DioException catch (e) {
       final s = e.response?.statusCode;
       final rejected = s == ApiStatus.badRequest ||
           s == ApiStatus.unauthorized ||
           s == ApiStatus.forbidden;
-      return (accessToken: null, invalid: rejected);
+      return (
+        accessToken: null,
+        invalid: rejected,
+        error: rejected ? null : e,
+      );
     }
   }
 }
