@@ -32,7 +32,9 @@ class _MosqueScreenState extends ConsumerState<MosqueScreen> {
 
   Future<void> _route(Mosque m) async {
     final ok = await ref.read(mosqueControllerProvider.notifier).openRoute(m);
-    if (!ok && mounted) showAppSnackBar(context, 'Aplikasi peta tidak dapat dibuka.');
+    if (!ok && mounted) {
+      showAppSnackBar(context, 'Aplikasi peta tidak dapat dibuka.');
+    }
   }
 
   Future<void> _pickCity() async {
@@ -57,14 +59,16 @@ class _MosqueScreenState extends ConsumerState<MosqueScreen> {
           IconButton(
             tooltip: _showMap ? 'Tampilkan daftar' : 'Tampilkan peta',
             icon: Icon(_showMap ? Icons.list : Icons.map_outlined),
-            onPressed: pos == null ? null : () => setState(() => _showMap = !_showMap),
+            onPressed:
+                pos == null ? null : () => setState(() => _showMap = !_showMap),
           ),
         ],
       ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.page, AppSpacing.sm, AppSpacing.page, 0),
+            padding: const EdgeInsets.fromLTRB(
+                AppSpacing.page, AppSpacing.sm, AppSpacing.page, 0),
             child: TextField(
               onChanged: c.setQuery,
               decoration: const InputDecoration(
@@ -75,7 +79,8 @@ class _MosqueScreenState extends ConsumerState<MosqueScreen> {
           ),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.page, vertical: AppSpacing.sm),
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.page, vertical: AppSpacing.sm),
             child: Row(
               children: [
                 for (final r in MosqueFilter.radii)
@@ -91,7 +96,8 @@ class _MosqueScreenState extends ConsumerState<MosqueScreen> {
                 SegmentedButton<MosqueSort>(
                   showSelectedIcon: false,
                   segments: const [
-                    ButtonSegment(value: MosqueSort.distance, label: Text('Jarak')),
+                    ButtonSegment(
+                        value: MosqueSort.distance, label: Text('Jarak')),
                     ButtonSegment(value: MosqueSort.name, label: Text('Nama')),
                   ],
                   selected: {s.sort},
@@ -111,7 +117,12 @@ class _MosqueScreenState extends ConsumerState<MosqueScreen> {
           if (s.error != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.page),
-              child: StatusBanner(kind: BannerKind.error, message: s.error!),
+              child: StatusBanner(
+                kind: BannerKind.error,
+                message: s.error!,
+                actionLabel: 'Coba lagi',
+                onAction: () => c.load(askPermission: false),
+              ),
             ),
           Expanded(child: _body(context, theme, s, c, visible)),
         ],
@@ -125,7 +136,15 @@ class _MosqueScreenState extends ConsumerState<MosqueScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     final pos = s.position;
-    if (pos == null) return _NoLocation(access: s.access, onRetry: c.load, onCity: _pickCity);
+    if (pos == null) {
+      return _NoLocation(
+        access: s.access,
+        onRetry: c.load,
+        onCity: _pickCity,
+        onAppSettings: c.openAppSettings,
+        onLocationSettings: c.openLocationSettings,
+      );
+    }
     if (_showMap) {
       return MosqueMap(
         userLat: pos.latitude,
@@ -137,7 +156,7 @@ class _MosqueScreenState extends ConsumerState<MosqueScreen> {
     }
     if (visible.isEmpty) {
       return RefreshIndicator(
-        onRefresh: c.load,
+        onRefresh: () => c.load(askPermission: false),
         child: ListView(
           children: [
             Padding(
@@ -157,7 +176,7 @@ class _MosqueScreenState extends ConsumerState<MosqueScreen> {
       );
     }
     return RefreshIndicator(
-      onRefresh: c.load,
+      onRefresh: () => c.load(askPermission: false),
       child: ListView.builder(
         padding: const EdgeInsets.all(AppSpacing.page),
         itemCount: visible.length,
@@ -177,19 +196,32 @@ class _MosqueScreenState extends ConsumerState<MosqueScreen> {
 }
 
 class _NoLocation extends StatelessWidget {
-  const _NoLocation({required this.access, required this.onRetry, required this.onCity});
+  const _NoLocation({
+    required this.access,
+    required this.onRetry,
+    required this.onCity,
+    required this.onAppSettings,
+    required this.onLocationSettings,
+  });
 
   final LocationAccess access;
   final Future<void> Function({bool askPermission}) onRetry;
   final VoidCallback onCity;
+  final Future<void> Function() onAppSettings;
+  final Future<void> Function() onLocationSettings;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final text = switch (access) {
-      LocationAccess.serviceDisabled => 'GPS mati. Nyalakan GPS atau pilih kota secara manual.',
-      LocationAccess.deniedForever => 'Izin lokasi ditolak. Ubah di pengaturan aplikasi atau pilih kota manual.',
-      _ => 'Izin lokasi diperlukan untuk mencari masjid terdekat.',
+      LocationAccess.serviceDisabled =>
+        'GPS mati. Nyalakan GPS atau pilih kota secara manual.',
+      LocationAccess.deniedForever =>
+        'Izin lokasi ditolak. Ubah di pengaturan aplikasi atau pilih kota manual.',
+      LocationAccess.denied =>
+        'Izin lokasi diperlukan untuk mencari masjid terdekat.',
+      LocationAccess.granted =>
+        'Lokasi belum tersedia. Coba lagi atau pilih kota secara manual.',
     };
     return Center(
       child: Padding(
@@ -197,12 +229,24 @@ class _NoLocation extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.location_off_outlined, size: 48, color: theme.colorScheme.onSurfaceVariant),
+            Icon(Icons.location_off_outlined,
+                size: 48, color: theme.colorScheme.onSurfaceVariant),
             const SizedBox(height: AppSpacing.md),
-            Text(text, textAlign: TextAlign.center, style: theme.textTheme.bodyLarge),
+            Text(text,
+                textAlign: TextAlign.center, style: theme.textTheme.bodyLarge),
             const SizedBox(height: AppSpacing.lg),
-            FilledButton(onPressed: () => onRetry(), child: const Text('Coba lagi')),
-            TextButton(onPressed: onCity, child: const Text('Pilih kota manual')),
+            FilledButton(
+                onPressed: () => onRetry(), child: const Text('Coba lagi')),
+            if (access == LocationAccess.deniedForever)
+              TextButton(
+                  onPressed: onAppSettings,
+                  child: const Text('Pengaturan aplikasi')),
+            if (access == LocationAccess.serviceDisabled)
+              TextButton(
+                  onPressed: onLocationSettings,
+                  child: const Text('Pengaturan lokasi')),
+            TextButton(
+                onPressed: onCity, child: const Text('Pilih kota manual')),
           ],
         ),
       ),

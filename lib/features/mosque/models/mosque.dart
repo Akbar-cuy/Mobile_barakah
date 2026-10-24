@@ -18,14 +18,30 @@ class Mosque {
     double? num_(Object? v) => v is num ? v.toDouble() : double.tryParse('$v');
     final lat = num_(j['lat'] ?? j['latitude']);
     final lon = num_(j['lon'] ?? j['lng'] ?? j['longitude']);
-    if (lat == null || lon == null) {
+    final rawId = j['osm_id'] ?? j['id'];
+    if (rawId == null ||
+        rawId.toString().trim().isEmpty ||
+        rawId.toString() == 'null' ||
+        lat == null ||
+        lon == null ||
+        !lat.isFinite ||
+        !lon.isFinite ||
+        lat < -90 ||
+        lat > 90 ||
+        lon < -180 ||
+        lon > 180) {
       throw const FormatException('koordinat masjid tidak ada');
     }
     final meters = num_(j['distance_m']) ??
-        (num_(j['distance_km']) == null ? null : num_(j['distance_km'])! * 1000);
+        (num_(j['distance_km']) == null
+            ? null
+            : num_(j['distance_km'])! * 1000);
     final name = (j['name'] ?? '').toString().trim();
+    if (meters != null && (!meters.isFinite || meters < 0)) {
+      throw const FormatException('jarak masjid tidak valid');
+    }
     return Mosque(
-      osmId: (j['osm_id'] ?? j['id']).toString(),
+      osmId: rawId.toString(),
       name: name.isEmpty ? 'Masjid tanpa nama' : name,
       lat: lat,
       lon: lon,
@@ -77,7 +93,8 @@ enum MosqueSort { distance, name }
 
 /// Hasil pencarian: [fromCache] true bila server tidak terjangkau.
 class MosqueResult {
-  const MosqueResult({required this.items, this.fromCache = false, this.cachedAt});
+  const MosqueResult(
+      {required this.items, this.fromCache = false, this.cachedAt});
 
   final List<Mosque> items;
   final bool fromCache;
@@ -106,7 +123,8 @@ abstract final class MosqueFilter {
       if (sort == MosqueSort.name) {
         return a.name.toLowerCase().compareTo(b.name.toLowerCase());
       }
-      return (a.distanceM ?? double.infinity).compareTo(b.distanceM ?? double.infinity);
+      return (a.distanceM ?? double.infinity)
+          .compareTo(b.distanceM ?? double.infinity);
     });
     return out;
   }

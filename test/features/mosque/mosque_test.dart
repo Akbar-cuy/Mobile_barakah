@@ -13,8 +13,15 @@ Mosque _m(String id, String name, double meters, {String? address}) => Mosque(
 void main() {
   group('Mosque.fromJson', () {
     test('membaca lon atau lng dan jarak meter atau kilometer', () {
-      final a = Mosque.fromJson({'osm_id': 1, 'name': 'A', 'lat': -6.2, 'lng': 106.8, 'distance_m': 250});
-      final b = Mosque.fromJson({'id': 'x', 'name': 'B', 'lat': '1.5', 'lon': 2, 'distance_km': 1.2});
+      final a = Mosque.fromJson({
+        'osm_id': 1,
+        'name': 'A',
+        'lat': -6.2,
+        'lng': 106.8,
+        'distance_m': 250
+      });
+      final b = Mosque.fromJson(
+          {'id': 'x', 'name': 'B', 'lat': '1.5', 'lon': 2, 'distance_km': 1.2});
       expect(a.osmId, '1');
       expect(a.lon, 106.8);
       expect(a.distanceM, 250);
@@ -23,8 +30,23 @@ void main() {
     });
 
     test('nama kosong diganti, koordinat hilang ditolak', () {
-      expect(Mosque.fromJson({'id': 1, 'name': ' ', 'lat': 0, 'lon': 0}).name, 'Masjid tanpa nama');
-      expect(() => Mosque.fromJson({'id': 1, 'name': 'A'}), throwsFormatException);
+      expect(Mosque.fromJson({'id': 1, 'name': ' ', 'lat': 0, 'lon': 0}).name,
+          'Masjid tanpa nama');
+      expect(
+          () => Mosque.fromJson({'id': 1, 'name': 'A'}), throwsFormatException);
+    });
+
+    test('menolak id dan koordinat yang tidak valid', () {
+      expect(() => Mosque.fromJson({'name': 'A', 'lat': 0, 'lon': 0}),
+          throwsFormatException);
+      expect(() => Mosque.fromJson({'id': 'x', 'lat': double.nan, 'lon': 0}),
+          throwsFormatException);
+      expect(() => Mosque.fromJson({'id': 'x', 'lat': 91, 'lon': 0}),
+          throwsFormatException);
+      expect(
+          () => Mosque.fromJson(
+              {'id': 'x', 'lat': 0, 'lon': 0, 'distance_m': -1}),
+          throwsFormatException);
     });
   });
 
@@ -50,12 +72,24 @@ void main() {
 
     test('urut nama tanpa membedakan huruf besar', () {
       final r = MosqueFilter.apply(all, radiusKm: 10, sort: MosqueSort.name);
-      expect([for (final m in r) m.name], ['Al-Ikhlas', 'Baiturrahman', 'Jauh', 'Masjid Raya']);
+      expect([for (final m in r) m.name],
+          ['Al-Ikhlas', 'Baiturrahman', 'Jauh', 'Masjid Raya']);
     });
 
     test('pencarian nama atau alamat', () {
-      expect([for (final m in MosqueFilter.apply(all, radiusKm: 10, query: 'sudirman')) m.osmId], ['3']);
-      expect([for (final m in MosqueFilter.apply(all, radiusKm: 10, query: 'IKHLAS')) m.osmId], ['2']);
+      expect([
+        for (final m
+            in MosqueFilter.apply(all, radiusKm: 10, query: 'sudirman'))
+          m.osmId
+      ], [
+        '3'
+      ]);
+      expect([
+        for (final m in MosqueFilter.apply(all, radiusKm: 10, query: 'IKHLAS'))
+          m.osmId
+      ], [
+        '2'
+      ]);
     });
 
     test('tanpa jarak tidak tersaring oleh radius dan diurut terakhir', () {

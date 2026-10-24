@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:drift/drift.dart';
 
 import '../../../core/constants/api_endpoints.dart';
+import '../../../core/config/app_config.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/database/daos/outbox_dao.dart';
 import '../../../core/database/daos/settings_dao.dart';
@@ -51,6 +52,18 @@ class ApiMosqueRepository implements MosqueRepository {
     required double lon,
     required double radiusKm,
   }) async {
+    if (!lat.isFinite ||
+        lat < -90 ||
+        lat > 90 ||
+        !lon.isFinite ||
+        lon < -180 ||
+        lon > 180 ||
+        !radiusKm.isFinite ||
+        radiusKm <= 0 ||
+        radiusKm > AppConfig.mosqueMaxRadiusKm) {
+      throw const FormatException(
+          'Koordinat atau radius pencarian tidak valid.');
+    }
     try {
       // Server dapat membatasi radius; permintaan selalu memakai radius terbesar
       // yang dipilih agar mengubah radius ke bawah tidak perlu jaringan.
@@ -59,20 +72,30 @@ class ApiMosqueRepository implements MosqueRepository {
         ApiEndpoints.mosquesNearby,
         query: {'lat': lat, 'lng': lon, 'radius': radiusKm},
       );
-      final raw = res['items'] ?? res['data'] ?? const [];
-      final items = <Mosque>[];
-      for (final e in raw as List) {
+      final raw = res['items'];
+      if (raw is! List) {
+        throw const FormatException('Respons masjid tidak valid.');
+      }
+      final unique = <String, Mosque>{};
+      for (final e in raw) {
         try {
-          items.add(Mosque.fromJson((e as Map).cast<String, dynamic>())
-              .withDistanceFrom(lat, lon));
+          if (e is! Map) continue;
+          final mosque = Mosque.fromJson(e.cast<String, dynamic>())
+              .withDistanceFrom(lat, lon);
+          unique.putIfAbsent(mosque.osmId, () => mosque);
         } catch (_) {
           continue; // entri rusak dilewati
         }
       }
+      final items = unique.values.toList(growable: false);
       await _saveCache(lat, lon, radiusKm, items);
       return MosqueResult(items: await _markFavorites(items));
     } on ApiException catch (e) {
-      if (!e.isConnectivity) rethrow;
+      if (!e.isConnectivity &&
+          !(e.kind == ApiErrorKind.server &&
+              e.code == 'mosque_source_unavailable')) {
+        rethrow;
+      }
       final cached = await _loadCache(lat, lon);
       if (cached == null) rethrow;
       return MosqueResult(
@@ -83,7 +106,8 @@ class ApiMosqueRepository implements MosqueRepository {
     }
   }
 
-  Future<void> _saveCache(double lat, double lon, double radiusKm, List<Mosque> items) {
+  Future<void> _saveCache(
+      double lat, double lon, double radiusKm, List<Mosque> items) {
     return settings.set(
       cacheKey,
       jsonEncode({
@@ -105,7 +129,7 @@ class ApiMosqueRepository implements MosqueRepository {
       final m = jsonDecode(raw) as Map<String, dynamic>;
       final items = [
         for (final e in m['items'] as List)
-          Mosque.fromJson((e as Map).cast<String, dynamic>()).withDistanceFrom(lat, lon),
+          Mosque.fromJson(e.cast<String, dynamic>()).withDistanceFrom(lat, lon),
       ];
       return (items, DateTime.tryParse('${m['at']}'));
     } catch (_) {
@@ -114,15 +138,24 @@ class ApiMosqueRepository implements MosqueRepository {
   }
 
   Future<List<Mosque>> _markFavorites(List<Mosque> items) async {
-    final favs = (await db.select(db.favoriteMosqueTable).get()).map((r) => r.osmId).toSet();
-    return [for (final m in items) m.copyWith(isFavorite: favs.contains(m.osmId))];
+    final favs = (await db.select(db.favoriteMosqueTable).get())
+        .map((r) => r.osmId)
+        .toSet();
+    return [
+      for (final m in items) m.copyWith(isFavorite: favs.contains(m.osmId))
+    ];
   }
 
   @override
   Stream<List<Mosque>> watchFavorites() {
     return db.select(db.favoriteMosqueTable).watch().map((rows) => [
           for (final r in rows)
-            Mosque(osmId: r.osmId, name: r.name, lat: r.lat, lon: r.lon, isFavorite: true),
+            Mosque(
+                osmId: r.osmId,
+                name: r.name,
+                lat: r.lat,
+                lon: r.lon,
+                isFavorite: true),
         ]);
   }
 
@@ -133,7 +166,9 @@ class ApiMosqueRepository implements MosqueRepository {
             ..where((t) => t.osmId.equals(mosque.osmId)))
           .getSingleOrNull();
       if (existing != null) {
-        await (db.delete(db.favoriteMosqueTable)..where((t) => t.osmId.equals(mosque.osmId))).go();
+        await (db.delete(db.favoriteMosqueTable)
+              ..where((t) => t.osmId.equals(mosque.osmId)))
+            .go();
         await outbox.enqueue(
           entity: OutboxEntity.favoriteMosque,
           op: OutboxOp.delete,

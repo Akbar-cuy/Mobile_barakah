@@ -66,11 +66,12 @@ class MosqueState {
     String? selectedId,
     bool clearError = false,
     bool clearSelected = false,
+    bool clearPosition = false,
   }) {
     return MosqueState(
       loading: loading ?? this.loading,
       all: all ?? this.all,
-      position: position ?? this.position,
+      position: clearPosition ? null : (position ?? this.position),
       access: access ?? this.access,
       radiusKm: radiusKm ?? this.radiusKm,
       query: query ?? this.query,
@@ -83,28 +84,41 @@ class MosqueState {
 }
 
 class MosqueController extends Notifier<MosqueState> {
+  bool _loadInProgress = false;
+
   @override
   MosqueState build() => const MosqueState();
 
   /// Mencari posisi lalu memuat masjid. Radius yang dikirim ke server selalu
   /// yang terbesar sehingga mengecilkan radius tidak butuh permintaan baru.
   Future<void> load({bool askPermission = true}) async {
+    if (_loadInProgress) return;
+    _loadInProgress = true;
     state = state.copyWith(loading: true, clearError: true);
-    final outcome =
-        await ref.read(locationResolverProvider).resolve(askPermission: askPermission);
-    final pos = outcome.position;
-    if (pos == null) {
-      state = state.copyWith(loading: false, access: outcome.access);
-      return;
-    }
-    state = state.copyWith(position: pos, access: LocationAccess.granted);
+    GeoPosition? resolvedPosition;
     try {
+      final outcome = await ref
+          .read(locationResolverProvider)
+          .resolve(askPermission: askPermission);
+      final pos = outcome.position;
+      resolvedPosition = pos;
+      if (pos == null) {
+        state = state.copyWith(
+          loading: false,
+          access: outcome.access,
+          clearPosition: true,
+          all: const [],
+        );
+        return;
+      }
+      state = state.copyWith(position: pos, access: LocationAccess.granted);
       final res = await ref.read(mosqueRepositoryProvider).nearby(
             lat: pos.latitude,
             lon: pos.longitude,
             radiusKm: MosqueFilter.radii.last,
           );
-      state = state.copyWith(loading: false, all: res.items, fromCache: res.fromCache);
+      state = state.copyWith(
+          loading: false, all: res.items, fromCache: res.fromCache);
     } on ApiException catch (e) {
       state = state.copyWith(
         loading: false,
@@ -113,9 +127,23 @@ class MosqueController extends Notifier<MosqueState> {
             : e.message,
       );
     } catch (_) {
-      state = state.copyWith(loading: false, error: 'Masjid gagal dimuat.');
+      state = state.copyWith(
+        loading: false,
+        clearPosition: resolvedPosition == null,
+        all: resolvedPosition == null ? const [] : null,
+        error:
+            'Lokasi atau data masjid gagal dimuat. Periksa izin dan koneksi lalu coba lagi.',
+      );
+    } finally {
+      _loadInProgress = false;
     }
   }
+
+  Future<void> openAppSettings() =>
+      ref.read(positionSourceProvider).openAppSettings();
+
+  Future<void> openLocationSettings() =>
+      ref.read(positionSourceProvider).openLocationSettings();
 
   void setRadius(double km) => state = state.copyWith(radiusKm: km);
   void setQuery(String q) => state = state.copyWith(query: q);
@@ -127,7 +155,10 @@ class MosqueController extends Notifier<MosqueState> {
   Future<void> toggleFavorite(Mosque m) async {
     final now = await ref.read(mosqueRepositoryProvider).toggleFavorite(m);
     state = state.copyWith(
-      all: [for (final x in state.all) x.osmId == m.osmId ? x.copyWith(isFavorite: now) : x],
+      all: [
+        for (final x in state.all)
+          x.osmId == m.osmId ? x.copyWith(isFavorite: now) : x
+      ],
     );
   }
 
