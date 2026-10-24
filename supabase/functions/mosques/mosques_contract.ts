@@ -108,7 +108,7 @@ export function makeOverpassQuery(request: NearbyRequest): string {
   const lat = request.lat;
   const lon = request.lon;
   return [
-    "[out:json][timeout:20];",
+    "[out:json][timeout:15];",
     "(",
     `node(around:${radius},${lat},${lon})["amenity"="place_of_worship"]["religion"="muslim"];`,
     `way(around:${radius},${lat},${lon})["amenity"="place_of_worship"]["religion"="muslim"];`,

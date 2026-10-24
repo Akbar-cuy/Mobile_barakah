@@ -39,6 +39,9 @@ class _State extends ConsumerState<NotificationSettingsScreen> {
       showAppSnackBar(
         context,
         'Izin notifikasi ditolak. Aktifkan lewat pengaturan sistem.',
+        actionLabel: 'Buka pengaturan',
+        onAction: () =>
+            ref.read(notificationServiceProvider).openSystemSettings(),
       );
     }
     return granted;
@@ -78,11 +81,24 @@ class _State extends ConsumerState<NotificationSettingsScreen> {
     if (!await _ensurePermission()) return;
     setState(() => _busy = true);
     try {
-      await ref.read(notificationServiceProvider).showNow(
-            'Uji notifikasi',
-            'Notifikasi Barakah berfungsi.',
-            prefs.sound,
-          );
+      final service = ref.read(notificationServiceProvider);
+      final shown = await service.showTest(
+        'Uji notifikasi',
+        'Notifikasi Barakah berfungsi.',
+        prefs.sound,
+      );
+      if (!mounted) return;
+      if (shown) {
+        showAppSnackBar(context, 'Notifikasi uji dikirim. Lihat bilah notifikasi.');
+      } else {
+        showAppSnackBar(
+          context,
+          'Notifikasi tidak tampil. Periksa mode Jangan Ganggu dan pengaturan '
+          'notifikasi Barakah.',
+          actionLabel: 'Buka pengaturan',
+          onAction: service.openSystemSettings,
+        );
+      }
     } on Object catch (error) {
       if (mounted) showAppSnackBar(context, 'Uji notifikasi gagal: $error');
     } finally {

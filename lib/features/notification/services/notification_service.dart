@@ -19,6 +19,13 @@ abstract interface class NotificationGateway {
     required String body,
     required NotificationSound sound,
   });
+
+  /// Apakah notifikasi [id] benar-benar tampil di bilah notifikasi. Bernilai
+  /// true bila platform tidak dapat memeriksanya.
+  Future<bool> isShowing(int id);
+
+  /// Membuka pengaturan notifikasi aplikasi di sistem.
+  Future<void> openSystemSettings();
 }
 
 class FlutterLocalNotificationsGateway implements NotificationGateway {
@@ -38,7 +45,7 @@ class FlutterLocalNotificationsGateway implements NotificationGateway {
     tzdata.initializeTimeZones();
     await _plugin.initialize(
       settings: const InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        android: AndroidInitializationSettings('@drawable/ic_stat_barakah'),
         iOS: DarwinInitializationSettings(
           requestAlertPermission: false,
           requestBadgePermission: false,
@@ -46,7 +53,58 @@ class FlutterLocalNotificationsGateway implements NotificationGateway {
         ),
       ),
     );
+    await _createChannels();
     _ready = true;
+  }
+
+  /// Saluran dibuat sejak awal agar nama dan tingkat pentingnya tetap, dan
+  /// pengguna dapat mengaturnya di pengaturan sistem.
+  Future<void> _createChannels() async {
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (android == null) return;
+    const channels = {
+      _adhanChannel: 'Waktu sholat',
+      _reminderChannel: 'Pengingat sebelum sholat',
+      _dhikrChannel: 'Dzikir harian',
+    };
+    for (final entry in channels.entries) {
+      await android.createNotificationChannel(
+        AndroidNotificationChannel(
+          entry.key,
+          entry.value,
+          importance: Importance.high,
+        ),
+      );
+      await android.createNotificationChannel(
+        AndroidNotificationChannel(
+          '${entry.key}_silent',
+          '${entry.value} (senyap)',
+          importance: Importance.high,
+          playSound: false,
+          enableVibration: false,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<bool> isShowing(int id) async {
+    await init();
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (android == null) return true;
+    try {
+      final active = await android.getActiveNotifications();
+      return active.any((n) => n.id == id);
+    } on Object {
+      return true;
+    }
+  }
+
+  @override
+  Future<void> openSystemSettings() async {
+    await openAppSettings();
   }
 
   @override
@@ -176,6 +234,19 @@ class NotificationService {
   }
 
   Future<void> showNow(String title, String body, NotificationSound sound) {
-    return _gateway.showNow(id: 1, title: title, body: body, sound: sound);
+    return _gateway.showNow(id: _testId, title: title, body: body, sound: sound);
   }
+
+  static const int _testId = 1;
+
+  /// Menampilkan notifikasi uji lalu memeriksa apakah benar muncul. False
+  /// berarti sistem menahannya (Jangan Ganggu, saluran dimatikan, dan sebagainya).
+  Future<bool> showTest(String title, String body, NotificationSound sound) async {
+    await _gateway.init();
+    await showNow(title, body, sound);
+    await Future<void>.delayed(const Duration(milliseconds: 400));
+    return _gateway.isShowing(_testId);
+  }
+
+  Future<void> openSystemSettings() => _gateway.openSystemSettings();
 }

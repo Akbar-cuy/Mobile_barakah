@@ -5,6 +5,7 @@ import '../constants/api_endpoints.dart';
 import '../database/daos/outbox_dao.dart';
 import '../database/daos/settings_dao.dart';
 import '../network/api_client.dart';
+import '../network/api_exception.dart';
 import '../network/connectivity_service.dart';
 import 'outbox_processor.dart';
 import 'sync_status.dart';
@@ -41,6 +42,9 @@ class SyncService {
   bool _error = false;
   bool _running = false;
 
+  /// Galat terakhir saat mengambil perubahan dari server (pull), atau null.
+  String? lastPullError;
+
   SyncStatus get status {
     if (_error) return SyncStatus.error;
     return _pending > 0 ? SyncStatus.pending : SyncStatus.synced;
@@ -68,9 +72,13 @@ class SyncService {
       _error = result.failed > 0;
       if (!result.offline && !result.sessionExpired) {
         await _pull();
+        lastPullError = null;
       }
-    } catch (_) {
+    } catch (e) {
       _error = true;
+      lastPullError = e is ApiException
+          ? '${e.statusCode ?? '-'} ${e.code ?? e.kind.name}: ${e.message}'
+          : e.toString();
     } finally {
       _running = false;
       _emit();

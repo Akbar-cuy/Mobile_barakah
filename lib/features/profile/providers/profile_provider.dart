@@ -1,6 +1,9 @@
 // M17 Profil
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/database/daos/outbox_dao.dart';
 import '../../../core/network/api_exception.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/sync/sync_status.dart';
@@ -31,6 +34,11 @@ final syncStatusProvider = StreamProvider<SyncStatus>((ref) async* {
   yield service.status;
   yield* service.statusStream;
 });
+
+/// Item sinkronisasi yang gagal beserta galat terakhirnya (FR-SYNC-07).
+final syncFailuresProvider = StreamProvider<List<OutboxItem>>(
+  (ref) => ref.watch(outboxDaoProvider).watchFailed(),
+);
 
 class BiometricStatus {
   const BiometricStatus({required this.enabled, required this.availability});
@@ -92,6 +100,20 @@ class ProfileController extends Notifier<ProfileActionState> {
           );
       ref.read(sessionProvider.notifier).updateUser(user);
     });
+  }
+
+  /// Mengunggah foto dan memperbarui pengguna di sesi. Mengembalikan tautan
+  /// foto baru, atau null bila gagal (galat ada di state).
+  Future<String?> uploadAvatar(Uint8List bytes, String contentType) async {
+    String? url;
+    final ok = await _run(() async {
+      final user = await ref
+          .read(profileRepositoryProvider)
+          .uploadAvatar(bytes: bytes, contentType: contentType);
+      ref.read(sessionProvider.notifier).updateUser(user);
+      url = user.avatarUrl;
+    });
+    return ok ? url : null;
   }
 
   Future<bool> changePassword({

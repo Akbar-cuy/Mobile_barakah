@@ -67,6 +67,15 @@ class OutboxDao extends DatabaseAccessor<AppDatabase> with _$OutboxDaoMixin {
   }
 
 
+  /// Item yang pernah gagal, untuk ditampilkan di Pengaturan agar penyebabnya
+  /// terlihat (entity dan galat terakhir).
+  Stream<List<OutboxItem>> watchFailed() {
+    return (select(outboxTable)
+          ..where((r) => r.attempts.isBiggerThanValue(0))
+          ..orderBy([(r) => OrderingTerm.asc(r.id)]))
+        .watch();
+  }
+
   Future<void> markSuccess(int id) async {
     await (delete(outboxTable)..where((r) => r.id.equals(id))).go();
   }

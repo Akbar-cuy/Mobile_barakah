@@ -67,7 +67,7 @@ class OutboxProcessor {
         }
         await outbox.markFailure(
           item.id,
-          '${e.code ?? e.kind.name}: ${e.message}',
+          '${e.statusCode ?? '-'} ${e.code ?? e.kind.name}: ${e.message}',
           now: _now(),
         );
         skipped.add(item.entity);

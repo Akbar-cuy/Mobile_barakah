@@ -10,6 +10,7 @@ import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/widgets/status_banner.dart';
 import '../providers/profile_provider.dart';
+import '../services/avatar_image.dart';
 import '../widgets/avatar_picker.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -57,6 +58,69 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return null;
   }
 
+  bool _uploading = false;
+
+  Future<void> _changePhoto() async {
+    final hasPhoto = _avatar.text.trim().isNotEmpty;
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Pilih dari galeri'),
+              onTap: () => Navigator.pop(ctx, 'gallery'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_camera_outlined),
+              title: const Text('Ambil foto'),
+              onTap: () => Navigator.pop(ctx, 'camera'),
+            ),
+            if (hasPhoto)
+              ListTile(
+                leading: const Icon(Icons.delete_outline),
+                title: const Text('Hapus foto'),
+                onTap: () => Navigator.pop(ctx, 'remove'),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || choice == null) return;
+    if (choice == 'remove') {
+      // Foto dihapus saat profil disimpan.
+      _avatar.clear();
+      return;
+    }
+
+    setState(() => _uploading = true);
+    String? message;
+    try {
+      final picked = await ref.read(avatarPickerServiceProvider).pick(
+            choice == 'camera' ? AvatarSource.camera : AvatarSource.gallery,
+          );
+      if (picked == null) return; // dibatalkan
+      final url = await ref
+          .read(profileControllerProvider.notifier)
+          .uploadAvatar(picked.bytes, picked.contentType);
+      if (url != null) {
+        _avatar.text = url;
+        message = 'Foto profil diperbarui.';
+      }
+    } on AvatarTooLargeException {
+      message = 'Foto terlalu besar. Pilih foto di bawah 1 MB.';
+    } on AvatarFormatException {
+      message = 'Format foto harus JPEG, PNG, atau WebP.';
+    } on Object {
+      message = 'Foto tidak dapat dibuka. Periksa izin galeri atau kamera.';
+    } finally {
+      if (mounted) setState(() => _uploading = false);
+    }
+    if (mounted && message != null) showAppSnackBar(context, message);
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     final ok = await ref.read(profileControllerProvider.notifier).save(
@@ -84,9 +148,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             Center(
               child: ValueListenableBuilder<TextEditingValue>(
                 valueListenable: _avatar,
-                builder: (_, value, __) => AvatarPicker(
-                  initials: user.initials,
-                  url: value.text,
+                builder: (_, value, __) => Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    AvatarPicker(
+                      initials: user.initials,
+                      url: value.text,
+                      onEdit: _uploading ? null : _changePhoto,
+                    ),
+                    if (_uploading)
+                      const CircularProgressIndicator(),
+                  ],
                 ),
               ),
             ),
@@ -118,7 +190,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 const SizedBox(height: AppSpacing.md),
                 AppTextField(
                   controller: _avatar,
-                  hint: 'Tautan foto profil (opsional)',
+                  hint: 'Atau tempel tautan foto (opsional)',
                   icon: Icons.image_outlined,
                   keyboardType: TextInputType.url,
                   validator: _avatarRule,

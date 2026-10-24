@@ -20,11 +20,27 @@ class SettingsScreen extends ConsumerWidget {
         _ => 'Memeriksa status.',
       };
 
+  static String _entityLabel(String entity) => switch (entity) {
+        OutboxEntity.donation => 'Donasi',
+        OutboxEntity.feedback => 'Saran dan kesan',
+        OutboxEntity.favoriteMosque => 'Masjid favorit',
+        OutboxEntity.tasbihLog => 'Tasbih',
+        OutboxEntity.setting => 'Pengaturan',
+        OutboxEntity.quizAttempt => 'Hasil kuis',
+        OutboxEntity.gameScore => 'Skor game',
+        OutboxEntity.chatMessage => 'Riwayat chat',
+        OutboxEntity.zakatCalc => 'Hitung zakat',
+        OutboxEntity.sessionRevoke => 'Keluar dari perangkat',
+        _ => entity,
+      };
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final mode = ref.watch(themeModeProvider);
     final status = ref.watch(syncStatusProvider).value;
+    final failures = ref.watch(syncFailuresProvider).value ?? const [];
+    final pullError = ref.read(syncServiceProvider).lastPullError;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Pengaturan')),
@@ -59,6 +75,40 @@ class SettingsScreen extends ConsumerWidget {
           Text('Sinkronisasi', style: theme.textTheme.titleSmall),
           const SizedBox(height: AppSpacing.sm),
           Text(_statusText(status)),
+          if (failures.isNotEmpty || pullError != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Penyebab', style: theme.textTheme.labelLarge),
+                    const SizedBox(height: AppSpacing.xs),
+                    for (final item in failures.take(6))
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+                        child: Text(
+                          '${_entityLabel(item.entity)}: '
+                          '${item.lastError ?? 'belum dikirim'}',
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      ),
+                    if (failures.length > 6)
+                      Text(
+                        'dan ${failures.length - 6} lainnya.',
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    if (pullError != null)
+                      Text(
+                        'Mengambil data dari server: $pullError',
+                        style: theme.textTheme.bodySmall,
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: AppSpacing.sm),
           Align(
             alignment: Alignment.centerLeft,

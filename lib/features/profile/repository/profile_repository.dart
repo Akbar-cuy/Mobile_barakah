@@ -1,5 +1,6 @@
 // M17 Profil (FR-PRO-02, FR-PRO-03, FR-PRO-06).
 import 'dart:convert';
+import 'dart:typed_data';
 
 import '../../../core/constants/api_endpoints.dart';
 import '../../../core/database/daos/settings_dao.dart';
@@ -65,6 +66,27 @@ class ProfileRepository {
     final rawUser = response['user'];
     if (rawUser is! Map) {
       throw const FormatException('Profile response is missing user data.');
+    }
+    final user = AppUser.fromJson(Map<String, dynamic>.from(rawUser));
+    await _settings.set(_cachedUserKey, jsonEncode(user.toJson()));
+    return user;
+  }
+
+  /// Mengunggah foto profil. Server menyimpannya dan mengembalikan pengguna
+  /// dengan tautan foto yang baru.
+  Future<AppUser> uploadAvatar({
+    required Uint8List bytes,
+    required String contentType,
+  }) async {
+    final response = await _api.request(
+      'POST',
+      ApiEndpoints.profileAvatar,
+      body: {'content_type': contentType, 'data': base64Encode(bytes)},
+      receiveTimeout: const Duration(seconds: 60),
+    );
+    final rawUser = response['user'];
+    if (rawUser is! Map) {
+      throw const FormatException('Avatar response is missing user data.');
     }
     final user = AppUser.fromJson(Map<String, dynamic>.from(rawUser));
     await _settings.set(_cachedUserKey, jsonEncode(user.toJson()));

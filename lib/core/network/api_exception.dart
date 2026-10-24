@@ -36,6 +36,11 @@ class ApiException implements Exception {
         details = err.cast<String, dynamic>();
         code = err['code']?.toString();
         message = err['message']?.toString();
+      } else {
+        // Galat dari gateway Supabase (bukan dari fungsi kita), misalnya
+        // {"code":"NOT_FOUND","message":"Requested function was not found"}.
+        code = body['code']?.toString();
+        message = _gatewayMessage(code, body['message']?.toString());
       }
     }
     final kind = _kindOf(status);
@@ -46,6 +51,22 @@ class ApiException implements Exception {
       code: code,
       details: details,
     );
+  }
+
+  /// Pesan berbahasa Indonesia untuk galat gateway yang artinya khas, atau
+  /// null bila tidak dikenali (pesan bawaan status dipakai).
+  static String? _gatewayMessage(String? code, String? raw) {
+    final text = (raw ?? '').toLowerCase();
+    if (code == 'NOT_FOUND' || text.contains('function was not found')) {
+      return 'Layanan ini belum tersedia di server (function belum di-deploy).';
+    }
+    if (code == 'BOOT_ERROR' ||
+        code == 'WORKER_ERROR' ||
+        text.contains('failed to start')) {
+      return 'Layanan di server gagal dijalankan. Periksa log Edge Function '
+          'di Supabase.';
+    }
+    return null;
   }
 
   factory ApiException.of(ApiErrorKind kind, {String? message}) {
