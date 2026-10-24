@@ -10,6 +10,8 @@ void main() {
       expect(service.validateAmount('abc'), isNotNull);
       expect(service.validateAmount('0'), isNotNull);
       expect(service.validateAmount('125,5'), isNull);
+      expect(service.validateAmount('NaN'), isNotNull);
+      expect(service.validateAmount('Infinity'), isNotNull);
     });
 
     test('converts currencies through USD rates', () {

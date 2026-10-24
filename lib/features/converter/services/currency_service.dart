@@ -14,7 +14,8 @@ class CurrencyService {
   // Terima "1000", "1000.50", atau "1,5"
   double? parseAmount(String text) {
     final clean = text.trim().replaceAll(',', '.');
-    return double.tryParse(clean);
+    final value = double.tryParse(clean);
+    return value != null && value.isFinite ? value : null;
   }
 
   // Konversi lewat USD sebagai jembatan.
@@ -53,8 +54,18 @@ class CurrencyService {
   // Label waktu pembaruan kurs, contoh: "Kurs per 15 Okt 2026 08.00"
   String ratesLabel(DateTime d) {
     const bulan = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
-      'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'Mei',
+      'Jun',
+      'Jul',
+      'Agu',
+      'Sep',
+      'Okt',
+      'Nov',
+      'Des'
     ];
     final jam = d.hour.toString().padLeft(2, '0');
     final menit = d.minute.toString().padLeft(2, '0');
