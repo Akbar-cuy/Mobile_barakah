@@ -4,6 +4,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/network/api_exception.dart';
 import '../models/chat_message.dart';
 import '../repository/chat_repository.dart';
 
@@ -96,8 +97,6 @@ class ChatNotifier extends Notifier<ChatState> {
       memuat: true,
       galat: '',
     );
-    await _repo.simpan(pesanUser);
-
     await _mintaJawaban(pesanUser);
   }
 
@@ -120,20 +119,27 @@ class ChatNotifier extends Notifier<ChatState> {
   // minta jawaban AI untuk satu pertanyaan
   Future<void> _mintaJawaban(ChatMessage pesanUser) async {
     try {
-      final jawaban = await _repo.kirimPertanyaan(pesanUser.content);
+      await _repo.simpan(pesanUser);
+      final pesanAI = await _repo.kirimPertanyaan(pesanUser);
 
       pesanUser.syncState = 'synced';
-      final pesanAI = ChatMessage.baru('assistant', jawaban);
-      pesanAI.syncState = 'synced';
+      await _repo.tandaiTersinkron(pesanUser);
       await _repo.simpan(pesanAI);
 
       state = state.salin(pesan: [...state.pesan, pesanAI], memuat: false);
     } catch (e) {
       pesanUser.syncState = 'failed';
+      try {
+        await _repo.simpan(pesanUser);
+      } catch (_) {
+        // Pertahankan galat jaringan utama pada layar.
+      }
       state = state.salin(
         pesan: [...state.pesan],
         memuat: false,
-        galat: 'Gagal terhubung. Periksa koneksi lalu coba lagi.',
+        galat: e is ApiException
+            ? e.message
+            : 'Gagal terhubung. Periksa koneksi lalu coba lagi.',
       );
     }
   }

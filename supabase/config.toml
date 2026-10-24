@@ -28,3 +28,6 @@ verify_jwt = false
 
 [functions.iot]
 verify_jwt = false
+
+[functions.ai]
+verify_jwt = false
