@@ -340,6 +340,17 @@ class _DonationTabState extends State<DonationTab> {
           if (provider.campaignsError != null)
             _DonationLoadError(
                 message: provider.campaignsError!, onRetry: provider.refresh),
+          if (provider.campaignSource == CampaignDataSource.cache)
+            Card(
+              color: Theme.of(context).colorScheme.tertiaryContainer,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text(
+                  'Offline: menampilkan cache kampanye terakhir'
+                  '${provider.campaignsCheckedAt == null ? '' : ' (${provider.campaignsCheckedAt!.toLocal()})'}.',
+                ),
+              ),
+            ),
           // Cari kampanye
           TextField(
             controller: _searchController,
@@ -370,13 +381,29 @@ class _DonationTabState extends State<DonationTab> {
           Column(
             children: [
               if (campaigns.isEmpty &&
-                  provider.campaigns.isEmpty &&
-                  provider.campaignsError == null)
+                  provider.campaignSource == CampaignDataSource.unavailable)
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                    'Kampanye belum tersedia. Sambungkan ke internet dan coba lagi.',
+                  ),
+                )
+              else if (campaigns.isEmpty &&
+                  provider.campaignSource == CampaignDataSource.cache)
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                    'Cache kampanye terakhir kosong. Sambungkan ke internet untuk memuat kampanye.',
+                  ),
+                )
+              else if (campaigns.isEmpty &&
+                  provider.campaignSource == CampaignDataSource.network &&
+                  provider.campaigns.isEmpty)
                 const Padding(
                   padding: EdgeInsets.all(16),
                   child: Text('Belum ada kampanye donasi yang aktif.'),
                 )
-              else if (campaigns.isEmpty && provider.campaignsError == null)
+              else if (campaigns.isEmpty && provider.campaigns.isNotEmpty)
                 const Padding(
                   padding: EdgeInsets.all(16),
                   child:

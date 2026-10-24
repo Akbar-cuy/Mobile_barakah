@@ -35,6 +35,8 @@ class DonationProvider extends ChangeNotifier {
 
   // ---------- Kampanye dan donasi ----------
   List<Campaign> campaigns = [];
+  CampaignDataSource campaignSource = CampaignDataSource.unavailable;
+  DateTime? campaignsCheckedAt;
   List<Donation> donations = [];
   String searchText = '';
   String category = 'Semua';
@@ -71,12 +73,17 @@ class DonationProvider extends ChangeNotifier {
     campaignsError = null;
     notifyListeners();
     try {
-      campaigns = await _repository.getCampaigns();
+      final campaignResult = await _repository.getCampaigns();
+      campaigns = campaignResult.items;
+      campaignSource = campaignResult.source;
+      campaignsCheckedAt = campaignResult.checkedAt;
+      campaignsError = campaignResult.message;
       if (selectedCampaign == null ||
           !campaigns.any((campaign) => campaign.id == selectedCampaign!.id)) {
         selectedCampaign = campaigns.isEmpty ? null : campaigns.first;
       }
     } catch (error) {
+      campaignSource = CampaignDataSource.unavailable;
       campaignsError = _errorMessage(error, 'Kampanye gagal dimuat.');
     }
     try {

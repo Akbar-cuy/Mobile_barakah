@@ -10,6 +10,13 @@ import '../../ledger/models/block.dart';
 import '../../ledger/repository/ledger_repository.dart';
 import '../models/donation_models.dart';
 
+class _CampaignCache {
+  const _CampaignCache({required this.items, required this.checkedAt});
+
+  final List<Campaign> items;
+  final DateTime checkedAt;
+}
+
 class DonationRepository {
   DonationRepository({
     required this.db,
@@ -23,21 +30,68 @@ class DonationRepository {
 
   static const double maxAmountIdr = 1000000000000000;
   static final RegExp _decimal = RegExp(r'^(?:0|[1-9]\d*)(?:\.\d+)?$');
+  static final RegExp _campaignUuid = RegExp(
+    r'^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+    caseSensitive: false,
+  );
+  static const campaignsCacheKey = 'donation_campaign_cache';
 
-  Future<List<Campaign>> getCampaigns({String? query, String? category}) async {
-    final response = await api.request(
-      'GET',
-      ApiEndpoints.campaigns,
-      query: {
-        'q': query?.trim().isEmpty == true ? null : query?.trim(),
-        'category': category == null || category == 'Semua' ? null : category,
-      },
-    );
-    final items = response['items'];
-    if (items is! List) {
+  Future<CampaignLoadResult> getCampaigns({
+    String? query,
+    String? category,
+  }) async {
+    final cached = await _readCampaignCache();
+    try {
+      final response = await api.request(
+        'GET',
+        ApiEndpoints.campaigns,
+        query: {
+          'q': query?.trim().isEmpty == true ? null : query?.trim(),
+          'category': category == null || category == 'Semua' ? null : category,
+        },
+      );
+      final campaigns = _parseCampaigns(response['items']);
+      final checkedAt = DateTime.now().toUtc();
+      String? message;
+      try {
+        await _writeCampaignCache(campaigns, cached, checkedAt);
+      } on Object {
+        message =
+            'Kampanye dimuat dari server, tetapi cache lokal gagal diperbarui.';
+      }
+      return CampaignLoadResult(
+        items: campaigns,
+        source: CampaignDataSource.network,
+        checkedAt: checkedAt,
+        message: message,
+      );
+    } on Object catch (error) {
+      final message = error is ApiException
+          ? error.message
+          : 'Kampanye gagal dimuat. Periksa koneksi lalu coba lagi.';
+      if (cached != null) {
+        return CampaignLoadResult(
+          items: cached.items,
+          source: CampaignDataSource.cache,
+          checkedAt: cached.checkedAt,
+          message: message,
+        );
+      }
+      return CampaignLoadResult(
+        items: const [],
+        source: CampaignDataSource.unavailable,
+        message: '$message Tidak ada cache kampanye tersimpan.',
+      );
+    }
+  }
+
+  List<Campaign> _parseCampaigns(Object? value) {
+    if (value is! List || value.length > 200) {
       throw const FormatException('Data kampanye tidak valid.');
     }
-    return items.map((item) {
+    final campaigns = <Campaign>[];
+    final ids = <String>{};
+    for (final item in value) {
       if (item is! Map) {
         throw const FormatException('Data kampanye tidak valid.');
       }
@@ -45,26 +99,81 @@ class DonationRepository {
       final id = row['id'];
       final title = row['title'];
       final description = row['description'];
-      final categoryValue = row['category'];
+      final category = row['category'];
       final target = row['target_idr'];
+      final version = row['version'];
       if (id is! String ||
-          id.isEmpty ||
+          !_campaignUuid.hasMatch(id) ||
+          !ids.add(id) ||
           title is! String ||
           title.trim().isEmpty ||
           description is! String ||
-          categoryValue is! String ||
+          category is! String ||
+          version is! int ||
           (target != null && target is! num) ||
           (target is num && (!target.toDouble().isFinite || target < 0))) {
         throw const FormatException('Data kampanye tidak valid.');
       }
-      return Campaign(
+      campaigns.add(Campaign(
         id: id,
         title: title,
         description: description,
-        category: categoryValue,
+        category: category,
         targetIdr: (target as num?)?.toDouble() ?? 0,
+        version: version,
+      ));
+    }
+    return campaigns;
+  }
+
+  Future<_CampaignCache?> _readCampaignCache() async {
+    try {
+      final raw = await db.settingsDao.get(campaignsCacheKey);
+      if (raw == null) return null;
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map<String, dynamic> ||
+          decoded['checked_at'] is! String ||
+          decoded['items'] is! List) {
+        return null;
+      }
+      final checkedAt = DateTime.tryParse(decoded['checked_at'] as String);
+      if (checkedAt == null) return null;
+      return _CampaignCache(
+        items: _parseCampaigns(decoded['items']),
+        checkedAt: checkedAt.toUtc(),
       );
-    }).toList(growable: false);
+    } on Object {
+      return null;
+    }
+  }
+
+  Future<void> _writeCampaignCache(
+    List<Campaign> incoming,
+    _CampaignCache? cached,
+    DateTime checkedAt,
+  ) async {
+    final byId = <String, Campaign>{
+      if (cached != null)
+        for (final campaign in cached.items) campaign.id: campaign,
+    };
+    for (final campaign in incoming) {
+      final previous = byId[campaign.id];
+      // The API can filter by query/category and excludes inactive rows, so an
+      // omitted ID is not evidence that a cached campaign was deleted. The
+      // PRD only permits updates when the server version is newer; for an
+      // equal version, keep the cached payload unchanged.
+      if (previous == null || campaign.version > previous.version) {
+        byId[campaign.id] = campaign;
+      }
+    }
+    await db.settingsDao.set(
+      campaignsCacheKey,
+      jsonEncode({
+        'checked_at': checkedAt.toIso8601String(),
+        'items': [for (final campaign in byId.values) campaign.toJson()],
+      }),
+      now: checkedAt,
+    );
   }
 
   Future<List<Donation>> getDonations() async {

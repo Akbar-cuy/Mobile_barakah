@@ -20,6 +20,18 @@ class _FakeApi implements ApiGateway {
   bool failDonationOnce = false;
   Completer<void>? donationGate;
   int failCampaigns = 0;
+  Map<String, dynamic> campaignResponse = {
+    'items': [
+      {
+        'id': '53a875cf-0f64-4a40-a7ca-3196d61d7264',
+        'title': 'Air Bersih',
+        'description': 'Sumur desa',
+        'category': 'Air',
+        'target_idr': 50000000,
+        'version': 1,
+      },
+    ],
+  };
 
   @override
   Future<Map<String, dynamic>> request(
@@ -43,17 +55,7 @@ class _FakeApi implements ApiGateway {
       };
     }
     if (path == '/campaigns') {
-      return {
-        'items': [
-          {
-            'id': '53a875cf-0f64-4a40-a7ca-3196d61d7264',
-            'title': 'Air Bersih',
-            'description': 'Sumur desa',
-            'category': 'Air',
-            'target_idr': 50000000,
-          },
-        ],
-      };
+      return campaignResponse;
     }
     if (path == '/donations') {
       if (donationGate != null) await donationGate!.future;
@@ -144,11 +146,157 @@ void main() {
   tearDown(() async => db.close());
 
   test('loads campaigns from authenticated API response contract', () async {
-    final campaigns = await repository.getCampaigns();
+    final result = await repository.getCampaigns();
     expect(api.calls.single.$1, 'GET');
     expect(api.calls.single.$2, '/campaigns');
-    expect(campaigns.single.id, '53a875cf-0f64-4a40-a7ca-3196d61d7264');
-    expect(campaigns.single.targetIdr, 50000000);
+    expect(result.source, CampaignDataSource.network);
+    expect(result.items.single.id, '53a875cf-0f64-4a40-a7ca-3196d61d7264');
+    expect(result.items.single.targetIdr, 50000000);
+    expect(result.items.single.version, 1);
+    expect(await db.settingsDao.get(DonationRepository.campaignsCacheKey),
+        isNotNull);
+  });
+
+  test('caches a new valid campaign without dropping existing valid entries',
+      () async {
+    await repository.getCampaigns();
+    api.campaignResponse = {
+      'items': [
+        {
+          'id': '53a875cf-0f64-4a40-a7ca-3196d61d7264',
+          'title': 'Air Bersih',
+          'description': 'Sumur desa',
+          'category': 'Air',
+          'target_idr': 50000000,
+          'version': 1,
+        },
+        {
+          'id': '2d92903b-bac9-4c64-98ed-8d2368345979',
+          'title': 'Pendidikan',
+          'description': 'Beasiswa pelajar',
+          'category': 'Pendidikan',
+          'target_idr': 12000000,
+          'version': 3,
+        },
+      ],
+    };
+
+    final result = await repository.getCampaigns();
+    final cachedJson = jsonDecode(
+      (await db.settingsDao.get(DonationRepository.campaignsCacheKey))!,
+    ) as Map<String, dynamic>;
+    final cachedItems = (cachedJson['items'] as List)
+        .cast<Map<String, dynamic>>()
+        .toList();
+
+    expect(result.items, hasLength(2));
+    expect(cachedItems, hasLength(2));
+    expect(
+      cachedItems.map((campaign) => campaign['id']),
+      containsAll([
+        '53a875cf-0f64-4a40-a7ca-3196d61d7264',
+        '2d92903b-bac9-4c64-98ed-8d2368345979',
+      ]),
+    );
+    expect(
+      cachedItems.singleWhere(
+        (campaign) => campaign['id'] == '2d92903b-bac9-4c64-98ed-8d2368345979',
+      )['version'],
+      3,
+    );
+  });
+
+  test('successful empty API response is distinct from request failure',
+      () async {
+    api.campaignResponse = {'items': <Object>[]};
+
+    final result = await repository.getCampaigns();
+
+    expect(result.items, isEmpty);
+    expect(result.source, CampaignDataSource.network);
+    expect(result.checkedAt, isNotNull);
+    expect(result.message, isNull);
+  });
+
+  test('returns an explicit unavailable result when cache and API are empty',
+      () async {
+    api.failCampaigns = 1;
+
+    final result = await repository.getCampaigns();
+
+    expect(result.items, isEmpty);
+    expect(result.source, CampaignDataSource.unavailable);
+    expect(result.message, contains('Tidak ada cache kampanye tersimpan'));
+  });
+
+  test('uses valid cache after campaign API failure and marks it as cached',
+      () async {
+    final online = await repository.getCampaigns();
+    final cachedAt = online.checkedAt;
+    api.failCampaigns = 1;
+
+    final result = await repository.getCampaigns();
+
+    expect(result.source, CampaignDataSource.cache);
+    expect(result.items.single.title, 'Air Bersih');
+    expect(result.checkedAt, cachedAt);
+    expect(result.message, isNotNull);
+  });
+
+  test('invalid API response falls back without replacing valid cache',
+      () async {
+    await repository.getCampaigns();
+    api.campaignResponse = {
+      'items': [
+        {
+          'id': '53a875cf-0f64-4a40-a7ca-3196d61d7264',
+          'title': 'Data rusak',
+          'description': 'Invalid version',
+          'category': 'Air',
+          'target_idr': 1,
+          'version': 'dua',
+        },
+      ],
+    };
+
+    final result = await repository.getCampaigns();
+
+    expect(result.source, CampaignDataSource.cache);
+    expect(result.items.single.title, 'Air Bersih');
+    final rawCache = await db.settingsDao.get(
+      DonationRepository.campaignsCacheKey,
+    );
+    expect(rawCache, contains('Air Bersih'));
+    expect(rawCache, isNot(contains('Data rusak')));
+  });
+
+  test('cache advances only when the server campaign version is newer',
+      () async {
+    await repository.getCampaigns();
+    api.campaignResponse = _campaignResponse(
+      title: 'Air Bersih versi 2',
+      version: 2,
+    );
+    await repository.getCampaigns();
+
+    api.campaignResponse = _campaignResponse(
+      title: 'Konten berubah tanpa kenaikan versi',
+      version: 2,
+    );
+    await repository.getCampaigns();
+
+    api.campaignResponse = _campaignResponse(
+      title: 'Respons versi lama',
+      version: 1,
+    );
+    final online = await repository.getCampaigns();
+    expect(online.source, CampaignDataSource.network);
+
+    api.failCampaigns = 1;
+    final cached = await repository.getCampaigns();
+    expect(cached.source, CampaignDataSource.cache);
+    expect(cached.items.single.title, 'Air Bersih versi 2');
+    expect(cached.items.single.version, 2);
   });
 
   test('creates idempotent backend donation and stores local outbox first',
@@ -289,6 +437,7 @@ Future<Donation> _saveCampaignDonation(DonationRepository repository) =>
         description: 'Sumur desa',
         category: 'Air',
         targetIdr: 50000000,
+        version: 1,
       ),
       campaignTitle: 'Air Bersih',
       donorAlias: 'Hamba Allah',
@@ -297,6 +446,23 @@ Future<Donation> _saveCampaignDonation(DonationRepository repository) =>
       amountIdr: 100,
       rateUsed: 1,
     );
+
+Map<String, dynamic> _campaignResponse({
+  required String title,
+  required int version,
+}) =>
+    {
+      'items': [
+        {
+          'id': '53a875cf-0f64-4a40-a7ca-3196d61d7264',
+          'title': title,
+          'description': 'Sumur desa',
+          'category': 'Air',
+          'target_idr': 50000000,
+          'version': version,
+        },
+      ],
+    };
 
 Future<void> _waitFor(bool Function() condition) async {
   for (var i = 0; i < 100 && !condition(); i++) {

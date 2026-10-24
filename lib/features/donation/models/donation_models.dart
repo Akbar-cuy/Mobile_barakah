@@ -5,6 +5,7 @@ class Campaign {
   final String description;
   final String category; // contoh: Air, Pendidikan, Masjid
   final double targetIdr;
+  final int version;
 
   const Campaign({
     required this.id,
@@ -12,7 +13,37 @@ class Campaign {
     required this.description,
     required this.category,
     required this.targetIdr,
+    required this.version,
   });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'description': description,
+        'category': category,
+        'target_idr': targetIdr,
+        'version': version,
+      };
+}
+
+enum CampaignDataSource { network, cache, unavailable }
+
+class CampaignLoadResult {
+  const CampaignLoadResult({
+    required this.items,
+    required this.source,
+    this.checkedAt,
+    this.message,
+  });
+
+  final List<Campaign> items;
+  final CampaignDataSource source;
+
+  /// Last time the cache envelope was checked or updated after a valid fetch.
+  final DateTime? checkedAt;
+
+  /// Safe user-facing notice when data is unavailable or cache persistence fails.
+  final String? message;
 }
 
 // Donasi yang sudah dikonfirmasi, lengkap dengan data blok ledger (PRD M12)
