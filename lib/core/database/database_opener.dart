@@ -16,14 +16,24 @@ QueryExecutor openEncryptedExecutor(String key) {
     return NativeDatabase.createInBackground(
       file,
       setup: (rawDb) {
-        assert(
-          rawDb.select('PRAGMA cipher;').isNotEmpty,
-          'SQLite3MultipleCiphers tidak aktif. Periksa pengaturan hooks di pubspec.yaml.',
-        );
+        ensureSqliteCipherAvailable(rawDb.select('PRAGMA cipher;').isNotEmpty);
         rawDb.execute("PRAGMA key = '${_escape(key)}';");
       },
     );
   });
+}
+
+/// Fails closed if the SQLite encryption hook is not available.
+///
+/// This must remain a runtime check: Dart assertions are removed in release
+/// builds, where silently opening an unencrypted database would expose local
+/// user data.
+void ensureSqliteCipherAvailable(bool isAvailable) {
+  if (!isAvailable) {
+    throw StateError(
+      'SQLite3MultipleCiphers tidak aktif. Periksa pengaturan hooks di pubspec.yaml.',
+    );
+  }
 }
 
 String _escape(String source) => source.replaceAll("'", "''");

@@ -39,6 +39,7 @@ class AladhanPrayerTimeService implements PrayerTimeSource {
   final Dio _dio;
 
   static final _hm = RegExp(r'(\d{1,2}):(\d{2})');
+  static final _date = RegExp(r'^(\d{2})-(\d{2})-(\d{4})$');
 
   @override
   Future<List<PrayerTimes>> fetchMonth({
@@ -85,11 +86,17 @@ class AladhanPrayerTimeService implements PrayerTimeSource {
       final gregorian = (item['date'] as Map?)?['gregorian'];
       if (timings is! Map || gregorian is! Map) continue;
 
-      final parts = gregorian['date'].toString().split('-');
-      if (parts.length != 3) continue;
-      final day = int.parse(parts[0]);
-      final month = int.parse(parts[1]);
-      final year = int.parse(parts[2]);
+      final match = _date.firstMatch(gregorian['date']?.toString() ?? '');
+      if (match == null) continue;
+      final day = int.parse(match.group(1)!);
+      final month = int.parse(match.group(2)!);
+      final year = int.parse(match.group(3)!);
+      final parsedDate = DateTime.utc(year, month, day);
+      if (parsedDate.day != day ||
+          parsedDate.month != month ||
+          parsedDate.year != year) {
+        continue;
+      }
 
       final zone = (item['meta'] as Map?)?['timezone']?.toString() ?? '';
       final offset =
@@ -97,9 +104,11 @@ class AladhanPrayerTimeService implements PrayerTimeSource {
 
       String? hm(String key) {
         final match = _hm.firstMatch(timings[key]?.toString() ?? '');
-        return match == null
-            ? null
-            : '${match.group(1)!.padLeft(2, '0')}:${match.group(2)}';
+        if (match == null) return null;
+        final hour = int.parse(match.group(1)!);
+        final minute = int.parse(match.group(2)!);
+        if (hour > 23 || minute > 59) return null;
+        return '${hour.toString().padLeft(2, '0')}:${match.group(2)}';
       }
 
       final times = {
