@@ -7,7 +7,7 @@ insert into public.quiz_questions (
 )
 select
   q.id, q.category, q.difficulty, q.question, q.options, q.answer_index,
-  q.explanation, q.version
+  q.explanation, coalesce(q.version, 1)
 from jsonb_to_recordset($questions$[
   {"id":"10000000-0000-4000-8000-000000000001","category":"rukun_iman","difficulty":1,"question":"Menurut Sahih al-Bukhari 8, berapa prinsip yang menjadi dasar Islam?","options":["Lima","Empat","Enam","Tujuh"],"answer_index":0,"explanation":"Hadis tersebut menyebut lima prinsip: syahadat, salat, zakat, haji, dan puasa Ramadan. Sumber: Sahih al-Bukhari 8."},
   {"id":"10000000-0000-4000-8000-000000000002","category":"rukun_iman","difficulty":1,"question":"Manakah yang disebut sebagai rukun Islam dalam Sahih al-Bukhari 8?","options":["Membayar zakat","Berpuasa setiap Senin","Membangun masjid","Membaca seluruh hadis"],"answer_index":0,"explanation":"Membayar zakat termasuk lima prinsip Islam yang disebut dalam Sahih al-Bukhari 8."},
