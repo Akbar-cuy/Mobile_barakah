@@ -1,5 +1,8 @@
 // Fondasi lintas fitur. Provider Riverpod untuk layanan inti.
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:drift/drift.dart' show Value;
 
 import '../database/app_database.dart';
 import '../database/daos/ledger_dao.dart';
@@ -12,6 +15,7 @@ import '../network/token_store.dart';
 import '../security/encryption_service.dart';
 import '../security/secure_storage_service.dart';
 import '../sync/outbox_processor.dart';
+import '../sync/sync_status.dart';
 import '../sync/sync_service.dart';
 // Pull handler milik fitur didaftarkan di sini (FR-SYNC-03). Saling impor
 // dengan provider fitur aman karena provider diinisialisasi malas.
@@ -78,6 +82,18 @@ final outboxProcessorProvider = Provider<OutboxProcessor>((ref) {
     outbox: ref.watch(outboxDaoProvider),
     ledger: ref.watch(ledgerDaoProvider),
     api: ref.watch(apiGatewayProvider),
+    onSynced: (item) async {
+      if (item.entity != OutboxEntity.quizAttempt) return;
+      final payload = jsonDecode(item.payload) as Map<String, dynamic>;
+      final id = payload['id'];
+      if (id is! String) return;
+      await (ref.read(appDatabaseProvider).update(
+                ref.read(appDatabaseProvider).quizAttemptTable,
+              )..where((row) => row.id.equals(id)))
+          .write(const QuizAttemptTableCompanion(
+        syncState: Value(SyncState.synced),
+      ));
+    },
   );
 });
 

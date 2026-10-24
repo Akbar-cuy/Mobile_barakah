@@ -21,6 +21,8 @@ abstract final class RouteNames {
   static const zakat = '/zakat';
   static const aiChat = '/tanya-ai';
   static const quiz = '/kuis';
+  static const quizQuestion = '/kuis/soal';
+  static const quizResult = '/kuis/hasil';
   static const directionGame = '/cari-arah';
 
   // Ledger.

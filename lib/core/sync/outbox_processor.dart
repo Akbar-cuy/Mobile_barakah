@@ -32,6 +32,7 @@ class OutboxProcessor {
     required this.outbox,
     required this.ledger,
     required this.api,
+    this.onSynced,
     DateTime Function()? clock,
     this.batchSize = 200,
   }) : _now = clock ?? DateTime.now;
@@ -39,6 +40,7 @@ class OutboxProcessor {
   final OutboxDao outbox;
   final LedgerDao ledger;
   final ApiGateway api;
+  final Future<void> Function(OutboxItem item)? onSynced;
   final int batchSize;
   final DateTime Function() _now;
 
@@ -52,6 +54,7 @@ class OutboxProcessor {
       if (skipped.contains(item.entity)) continue;
       try {
         await _send(item);
+        await onSynced?.call(item);
         await outbox.markSuccess(item.id);
         sent++;
       } on ApiException catch (e) {
@@ -59,7 +62,8 @@ class OutboxProcessor {
           return OutboxRunResult(sent: sent, failed: failed, offline: true);
         }
         if (e.kind == ApiErrorKind.unauthorized) {
-          return OutboxRunResult(sent: sent, failed: failed, sessionExpired: true);
+          return OutboxRunResult(
+              sent: sent, failed: failed, sessionExpired: true);
         }
         await outbox.markFailure(
           item.id,
@@ -99,13 +103,26 @@ class OutboxProcessor {
             query: {'osm_id': payload['osm_id']},
           );
         } else {
-          await api.request('POST', ApiEndpoints.favoriteMosques, body: payload);
+          await api.request('POST', ApiEndpoints.favoriteMosques,
+              body: payload);
         }
       case OutboxEntity.sessionRevoke:
         await api.request(
           'POST',
           ApiEndpoints.logout,
           body: {'refresh_token': payload['refresh_token']},
+        );
+      case OutboxEntity.quizAttempt:
+        await api.request(
+          'POST',
+          ApiEndpoints.quizAttempts,
+          body: payload,
+        );
+      case OutboxEntity.gameScore:
+        await api.request(
+          'POST',
+          ApiEndpoints.gameScores,
+          body: payload,
         );
       default:
         await api.request(

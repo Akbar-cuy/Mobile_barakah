@@ -14,6 +14,8 @@ import '../../features/donation/screens/donation_screen.dart';
 import '../../features/feedback/screens/feedback_screen.dart';
 import '../../features/games/screens/direction_game_screen.dart';
 import '../../features/games/screens/quiz_category_screen.dart';
+import '../../features/games/screens/quiz_question_screen.dart';
+import '../../features/games/screens/quiz_result_screen.dart';
 import '../../features/home/screens/home_screen.dart';
 import '../../features/iot/screens/iot_screen.dart';
 import '../../features/ledger/screens/block_detail_screen.dart';
@@ -62,15 +64,21 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) =>
         redirectFor(ref.read(sessionProvider).status, state.matchedLocation),
     routes: [
-      GoRoute(path: RouteNames.splash, builder: (_, __) => const SplashScreen()),
+      GoRoute(
+          path: RouteNames.splash, builder: (_, __) => const SplashScreen()),
       GoRoute(path: RouteNames.login, builder: (_, __) => const LoginScreen()),
-      GoRoute(path: RouteNames.register, builder: (_, __) => const RegisterScreen()),
-      GoRoute(path: RouteNames.lock, builder: (_, __) => const BiometricLockScreen()),
+      GoRoute(
+          path: RouteNames.register,
+          builder: (_, __) => const RegisterScreen()),
+      GoRoute(
+          path: RouteNames.lock,
+          builder: (_, __) => const BiometricLockScreen()),
       GoRoute(
         path: RouteNames.notificationSettings,
         builder: (_, __) => const NotificationSettingsScreen(),
       ),
-      GoRoute(path: RouteNames.mosque, builder: (_, __) => const MosqueScreen()),
+      GoRoute(
+          path: RouteNames.mosque, builder: (_, __) => const MosqueScreen()),
       GoRoute(path: RouteNames.qibla, builder: (_, __) => const QiblaScreen()),
       GoRoute(
         path: RouteNames.tasbih,
@@ -82,11 +90,27 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      GoRoute(path: RouteNames.converter, builder: (_, __) => const ConverterScreen()),
-      GoRoute(path: RouteNames.donation, builder: (_, __) => const DonationScreen()),
-      GoRoute(path: RouteNames.zakat, builder: (_, __) => const DonationScreen()),
-      GoRoute(path: RouteNames.aiChat, builder: (_, __) => const AiChatScreen()),
-      GoRoute(path: RouteNames.quiz, builder: (_, __) => const QuizCategoryScreen()),
+      GoRoute(
+          path: RouteNames.converter,
+          builder: (_, __) => const ConverterScreen()),
+      GoRoute(
+          path: RouteNames.donation,
+          builder: (_, __) => const DonationScreen()),
+      GoRoute(
+          path: RouteNames.zakat, builder: (_, __) => const DonationScreen()),
+      GoRoute(
+          path: RouteNames.aiChat, builder: (_, __) => const AiChatScreen()),
+      GoRoute(
+          path: RouteNames.quiz,
+          builder: (_, __) => const QuizCategoryScreen()),
+      GoRoute(
+        path: RouteNames.quizQuestion,
+        builder: (_, __) => const QuizQuestionScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.quizResult,
+        builder: (_, __) => const QuizResultScreen(),
+      ),
       GoRoute(
         path: RouteNames.directionGame,
         builder: (_, __) => const DirectionGameScreen(),
@@ -111,14 +135,19 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: RouteNames.changePassword,
         builder: (_, __) => const ChangePasswordScreen(),
       ),
-      GoRoute(path: RouteNames.security, builder: (_, __) => const SecurityScreen()),
-      GoRoute(path: RouteNames.settings, builder: (_, __) => const SettingsScreen()),
+      GoRoute(
+          path: RouteNames.security,
+          builder: (_, __) => const SecurityScreen()),
+      GoRoute(
+          path: RouteNames.settings,
+          builder: (_, __) => const SettingsScreen()),
       GoRoute(path: RouteNames.iot, builder: (_, __) => const IotScreen()),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => MainShell(navigationShell: shell),
         branches: [
           StatefulShellBranch(routes: [
-            GoRoute(path: RouteNames.home, builder: (_, __) => const HomeScreen()),
+            GoRoute(
+                path: RouteNames.home, builder: (_, __) => const HomeScreen()),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(
