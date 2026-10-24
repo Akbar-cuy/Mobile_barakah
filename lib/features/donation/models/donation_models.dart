@@ -31,6 +31,7 @@ class Donation {
   final String prevHash;
   final int nonce;
   final String hash;
+  final bool isSynced;
 
   const Donation({
     required this.id,
@@ -45,6 +46,7 @@ class Donation {
     required this.prevHash,
     required this.nonce,
     required this.hash,
+    this.isSynced = false,
   });
 }
 

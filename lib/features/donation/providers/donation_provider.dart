@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/network/api_exception.dart';
 import '../../converter/repository/rate_repository.dart';
 import '../../converter/services/currency_service.dart';
 import '../models/donation_models.dart';
@@ -8,20 +9,33 @@ import '../services/zakat_calculator.dart';
 
 // State untuk layar Zakat dan Donasi
 class DonationProvider extends ChangeNotifier {
-  final DonationRepository _repository = DonationRepository.instance;
-  final RateRepository _rateRepository = RateRepository();
+  DonationProvider({
+    required DonationRepository repository,
+    required RateRepository rateRepository,
+  })  : _repository = repository,
+        _rateRepository = rateRepository {
+    _load();
+  }
+
+  final DonationRepository _repository;
+  final RateRepository _rateRepository;
   final CurrencyService _currencyService = CurrencyService();
   final ZakatCalculator _calculator = ZakatCalculator();
 
   bool _disposed = false;
+  bool _loadRunning = false;
 
   // ---------- Data umum ----------
   bool loading = true;
   bool saving = false;
+  String? campaignsError;
+  String? ratesError;
+  String? submitError;
   RateData? rates;
 
   // ---------- Kampanye dan donasi ----------
   List<Campaign> campaigns = [];
+  List<Donation> donations = [];
   String searchText = '';
   String category = 'Semua';
   Campaign? selectedCampaign;
@@ -38,10 +52,6 @@ class DonationProvider extends ChangeNotifier {
   ZakatResult? zakatResult;
   String? zakatError;
 
-  DonationProvider() {
-    _load();
-  }
-
   // Cegah notifyListeners dipanggil setelah provider dibuang
   @override
   void dispose() {
@@ -55,12 +65,40 @@ class DonationProvider extends ChangeNotifier {
   }
 
   Future<void> _load() async {
-    campaigns = await _repository.getCampaigns();
-    rates = await _rateRepository.getRates();
-    if (campaigns.isNotEmpty) selectedCampaign = campaigns.first;
+    if (_disposed || _loadRunning) return;
+    _loadRunning = true;
+    loading = true;
+    campaignsError = null;
+    notifyListeners();
+    try {
+      campaigns = await _repository.getCampaigns();
+      if (selectedCampaign == null ||
+          !campaigns.any((campaign) => campaign.id == selectedCampaign!.id)) {
+        selectedCampaign = campaigns.isEmpty ? null : campaigns.first;
+      }
+    } catch (error) {
+      campaignsError = _errorMessage(error, 'Kampanye gagal dimuat.');
+    }
+    try {
+      rates = await _rateRepository.getRates();
+      ratesError = rates == null ? 'Kurs belum tersedia.' : null;
+    } catch (error) {
+      ratesError = _errorMessage(error, 'Kurs gagal dimuat.');
+    }
+    try {
+      donations = await _repository.getDonations();
+    } catch (_) {
+      // Riwayat tidak boleh menghalangi pengguna melihat atau membuat donasi.
+    }
     loading = false;
+    _loadRunning = false;
     notifyListeners();
   }
+
+  Future<void> refresh() => _load();
+
+  String _errorMessage(Object error, String fallback) =>
+      error is ApiException ? error.message : fallback;
 
   String formatMoney(double value, String currencyCode) {
     return _currencyService.format(value, currencyCode);
@@ -108,13 +146,33 @@ class DonationProvider extends ChangeNotifier {
   // Donasi
   // =====================================================
 
-  String? get amountError => _currencyService.validateAmount(amountText);
+  String? get amountError {
+    final basicError = _currencyService.validateAmount(amountText);
+    if (basicError != null) return basicError;
+    final normalized = amountText.trim().replaceAll(',', '.');
+    if (!RegExp(r'^(?:0|[1-9]\d*)(?:\.\d+)?$').hasMatch(normalized)) {
+      return 'Nominal harus berupa angka desimal yang valid.';
+    }
+    final amount = double.parse(normalized);
+    if (amount > DonationRepository.maxAmountIdr) {
+      return 'Nominal terlalu besar.';
+    }
+    if (currency == 'IDR' &&
+        normalized.contains('.') &&
+        normalized.split('.').last.replaceAll('0', '').isNotEmpty) {
+      return 'Nominal IDR harus berupa bilangan bulat.';
+    }
+    if (currency != 'IDR' &&
+        normalized.contains('.') &&
+        normalized.split('.').last.length > 2) {
+      return 'Maksimal dua angka di belakang koma.';
+    }
+    return null;
+  }
 
   // Pesan galat baru ditampilkan setelah pengguna mulai mengetik
   // atau menekan konfirmasi
   bool get showAmountError => amountText.isNotEmpty || submitted;
-
-  List<Donation> get donations => _repository.donations;
 
   // Padanan nominal pada dua mata uang lain
   List<MapEntry<String, String>> get equivalents {
@@ -148,40 +206,59 @@ class DonationProvider extends ChangeNotifier {
 
   // Konfirmasi donasi. Mengembalikan donasi bila berhasil, null bila gagal.
   Future<Donation?> confirmDonation() async {
+    if (saving) return null;
     submitted = true;
+    submitError = null;
     final amount = _currencyService.parseAmount(amountText);
     final data = rates;
     final campaign = selectedCampaign;
 
     if (amountError != null ||
         amount == null ||
-        data == null ||
+        (currency != 'IDR' && data == null) ||
         campaign == null) {
+      notifyListeners();
+      return null;
+    }
+
+    final rate = currency == 'IDR'
+        ? 1.0
+        : _currencyService.convert(1, currency, 'IDR', data!.perUsd);
+    final amountIdr = (amount * rate).roundToDouble();
+    if (!rate.isFinite ||
+        rate <= 0 ||
+        !amountIdr.isFinite ||
+        amountIdr <= 0 ||
+        amountIdr > DonationRepository.maxAmountIdr) {
+      submitError = 'Nominal setara rupiah berada di luar batas.';
+      submitted = false;
       notifyListeners();
       return null;
     }
 
     saving = true;
     notifyListeners();
-
-    final rate = currency == 'IDR'
-        ? 1.0
-        : _currencyService.convert(1, currency, 'IDR', data.perUsd);
-
-    final donation = await _repository.saveDonation(
-      campaignTitle: campaign.title,
-      donorAlias: donorAlias,
-      amount: amount,
-      currency: currency,
-      amountIdr: amount * rate,
-      rateUsed: rate,
-    );
-
-    saving = false;
-    submitted = false;
-    amountText = '';
-    notifyListeners();
-    return donation;
+    try {
+      final donation = await _repository.saveDonation(
+        campaign: campaign,
+        campaignTitle: campaign.title,
+        donorAlias: donorAlias,
+        amount: amount,
+        currency: currency,
+        amountIdr: amountIdr,
+        rateUsed: rate,
+      );
+      donations = [...donations, donation];
+      amountText = '';
+      submitted = false;
+      return donation;
+    } catch (error) {
+      submitError = _errorMessage(error, 'Donasi gagal disimpan. Coba lagi.');
+      return null;
+    } finally {
+      saving = false;
+      notifyListeners();
+    }
   }
 
   // =====================================================
@@ -290,24 +367,39 @@ class DonationProvider extends ChangeNotifier {
 
   // Bayar zakat (simulasi): dicatat sebagai donasi dalam rupiah
   Future<Donation?> donateZakat() async {
+    if (saving) return null;
     final result = zakatResult;
     if (result == null || !result.wajib) return null;
 
-    saving = true;
-    notifyListeners();
-
     final amount = result.resultIdr.roundToDouble();
-    final donation = await _repository.saveDonation(
-      campaignTitle: zakatType == 'maal' ? 'Zakat Maal' : 'Zakat Fitrah',
-      donorAlias: donorAlias,
-      amount: amount,
-      currency: 'IDR',
-      amountIdr: amount,
-      rateUsed: 1,
-    );
-
-    saving = false;
+    if (!amount.isFinite ||
+        amount <= 0 ||
+        amount > DonationRepository.maxAmountIdr) {
+      submitError = 'Nominal zakat berada di luar batas.';
+      notifyListeners();
+      return null;
+    }
+    saving = true;
+    submitError = null;
     notifyListeners();
-    return donation;
+    try {
+      final donation = await _repository.saveDonation(
+        campaign: null,
+        campaignTitle: zakatType == 'maal' ? 'Zakat Maal' : 'Zakat Fitrah',
+        donorAlias: donorAlias,
+        amount: amount,
+        currency: 'IDR',
+        amountIdr: amount,
+        rateUsed: 1,
+      );
+      donations = [...donations, donation];
+      return donation;
+    } catch (error) {
+      submitError = _errorMessage(error, 'Donasi zakat gagal disimpan.');
+      return null;
+    } finally {
+      saving = false;
+      notifyListeners();
+    }
   }
 }

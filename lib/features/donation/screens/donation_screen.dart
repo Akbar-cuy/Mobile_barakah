@@ -1,19 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'
+    show ConsumerWidget, WidgetRef;
 import 'package:provider/provider.dart';
 
+import '../../../core/providers/app_providers.dart';
+import '../../auth/providers/session_provider.dart';
+import '../../converter/repository/rate_repository.dart';
+import '../../ledger/repository/ledger_repository.dart';
 import '../models/donation_models.dart';
 import '../providers/donation_provider.dart';
+import '../repository/donation_repository.dart';
 import '../widgets/donation_widgets.dart';
 import 'donation_receipt_screen.dart';
 
 // Layar Zakat dan Donasi: tab Zakat dan tab Donasi
-class DonationScreen extends StatelessWidget {
+class DonationScreen extends ConsumerWidget {
   const DonationScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final db = ref.read(appDatabaseProvider);
+    final api = ref.read(apiGatewayProvider);
+    final userId = ref.read(sessionProvider).user?.id;
+    final ledger = ApiLedgerRepository(
+      db: db,
+      ledger: db.ledgerDao,
+      settings: db.settingsDao,
+      api: api,
+      currentUserId: () async => userId,
+    );
     return ChangeNotifierProvider(
-      create: (_) => DonationProvider(),
+      create: (_) => DonationProvider(
+        repository: DonationRepository(db: db, api: api, ledger: ledger),
+        rateRepository: RateRepository(db: db, api: api),
+      ),
       child: DefaultTabController(
         length: 2,
         child: Scaffold(
@@ -77,12 +97,13 @@ class _ZakatTabState extends State<ZakatTab> {
     final provider = context.read<DonationProvider>();
     final donation = await provider.donateZakat();
     if (donation == null || !mounted) return;
-    Navigator.push(
+    await Navigator.push<void>(
       context,
       MaterialPageRoute(
         builder: (_) => DonationReceiptScreen(donation: donation),
       ),
     );
+    if (mounted) await context.read<DonationProvider>().refresh();
   }
 
   @override
@@ -234,6 +255,13 @@ class _ZakatTabState extends State<ZakatTab> {
                   )
                 : const Text('Bayar zakat (simulasi)'),
           ),
+          if (provider.submitError != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              provider.submitError!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+          ],
           const SizedBox(height: 8),
           const Text(
             'Donasi bersifat simulasi, tidak ada pembayaran riil.',
@@ -270,13 +298,14 @@ class _DonationTabState extends State<DonationTab> {
     super.dispose();
   }
 
-  void _openReceipt(Donation donation) {
-    Navigator.push(
+  Future<void> _openReceipt(Donation donation) async {
+    await Navigator.push<void>(
       context,
       MaterialPageRoute(
         builder: (_) => DonationReceiptScreen(donation: donation),
       ),
     );
+    if (mounted) await context.read<DonationProvider>().refresh();
   }
 
   Future<void> _confirm() async {
@@ -284,14 +313,16 @@ class _DonationTabState extends State<DonationTab> {
     final donation = await provider.confirmDonation();
     if (donation == null || !mounted) return;
     _amountController.clear();
-    _openReceipt(donation);
+    await _openReceipt(donation);
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<DonationProvider>();
 
-    if (provider.loading) {
+    if (provider.loading &&
+        provider.campaigns.isEmpty &&
+        provider.campaignsError == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -299,125 +330,177 @@ class _DonationTabState extends State<DonationTab> {
     final equivalents = provider.equivalents;
     final history = provider.donations.reversed.toList();
 
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        // Cari kampanye
-        TextField(
-          controller: _searchController,
-          decoration: const InputDecoration(
-            labelText: 'Cari kampanye',
-            prefixIcon: Icon(Icons.search),
-            border: OutlineInputBorder(),
-          ),
-          onChanged: provider.setSearch,
-        ),
-        const SizedBox(height: 8),
-
-        // Filter kategori
-        Wrap(
-          spacing: 8,
-          children: [
-            for (final c in provider.categories)
-              ChoiceChip(
-                label: Text(c),
-                selected: c == provider.category,
-                onSelected: (_) => provider.setCategory(c),
-              ),
-          ],
-        ),
-        const SizedBox(height: 8),
-
-        // Daftar kampanye
-        Column(
-          children: [
-            if (campaigns.isEmpty)
-              const Padding(
-                padding: EdgeInsets.all(16),
-                child: Text('Kampanye tidak ditemukan. Coba ubah kata kunci.'),
-              )
-            else
-              for (final c in campaigns)
-                CampaignCard(
-                  campaign: c,
-                  selected: provider.selectedCampaign?.id == c.id,
-                  onTap: () => provider.selectCampaign(c),
-                ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Kampanye dipilih: ${provider.selectedCampaign?.title ?? '-'}',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-
-        // Nominal dan mata uang
-        AmountInput(
-          label: 'Nominal donasi',
-          controller: _amountController,
-          currency: provider.currency,
-          errorText: provider.showAmountError ? provider.amountError : null,
-          onAmountChanged: provider.setAmount,
-          onCurrencyChanged: provider.setCurrency,
-        ),
-        if (equivalents.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Text('Setara: ${equivalents.map((e) => e.value).join('  |  ')}'),
-        ],
-        const SizedBox(height: 12),
-
-        // Alias donatur
-        TextField(
-          controller: _aliasController,
-          decoration: const InputDecoration(
-            labelText: 'Alias donatur',
-            border: OutlineInputBorder(),
-          ),
-          onChanged: provider.setAlias,
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'Donasi bersifat simulasi, tidak ada pembayaran riil.',
-          style: TextStyle(fontSize: 12),
-        ),
-        const SizedBox(height: 12),
-
-        ElevatedButton(
-          onPressed: provider.saving ? null : _confirm,
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size.fromHeight(48),
-          ),
-          child: provider.saving
-              ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Text('Konfirmasi donasi'),
-        ),
-
-        // Riwayat donasi
-        if (history.isNotEmpty) ...[
-          const SizedBox(height: 24),
-          const Text(
-            'Riwayat donasi',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          for (final d in history)
-            Card(
-              child: ListTile(
-                title: Text(d.campaignTitle),
-                subtitle: Text('Blok #${d.blockIndex}'),
-                trailing: Text(
-                  provider.formatMoney(d.amount, d.currency),
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                onTap: () => _openReceipt(d),
-              ),
+    return RefreshIndicator(
+      onRefresh: provider.refresh,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        children: [
+          if (provider.loading) const LinearProgressIndicator(),
+          if (provider.campaignsError != null)
+            _DonationLoadError(
+                message: provider.campaignsError!, onRetry: provider.refresh),
+          // Cari kampanye
+          TextField(
+            controller: _searchController,
+            decoration: const InputDecoration(
+              labelText: 'Cari kampanye',
+              prefixIcon: Icon(Icons.search),
+              border: OutlineInputBorder(),
             ),
+            onChanged: provider.setSearch,
+          ),
+          const SizedBox(height: 8),
+
+          // Filter kategori
+          Wrap(
+            spacing: 8,
+            children: [
+              for (final c in provider.categories)
+                ChoiceChip(
+                  label: Text(c),
+                  selected: c == provider.category,
+                  onSelected: (_) => provider.setCategory(c),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          // Daftar kampanye
+          Column(
+            children: [
+              if (campaigns.isEmpty &&
+                  provider.campaigns.isEmpty &&
+                  provider.campaignsError == null)
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text('Belum ada kampanye donasi yang aktif.'),
+                )
+              else if (campaigns.isEmpty && provider.campaignsError == null)
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child:
+                      Text('Kampanye tidak ditemukan. Coba ubah kata kunci.'),
+                )
+              else
+                for (final c in campaigns)
+                  CampaignCard(
+                    campaign: c,
+                    selected: provider.selectedCampaign?.id == c.id,
+                    onTap: () => provider.selectCampaign(c),
+                  ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Kampanye dipilih: ${provider.selectedCampaign?.title ?? '-'}',
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+
+          // Nominal dan mata uang
+          AmountInput(
+            label: 'Nominal donasi',
+            controller: _amountController,
+            currency: provider.currency,
+            errorText: provider.showAmountError ? provider.amountError : null,
+            onAmountChanged: provider.setAmount,
+            onCurrencyChanged: provider.setCurrency,
+          ),
+          if (provider.currency != 'IDR' && provider.ratesError != null)
+            _DonationLoadError(
+                message: provider.ratesError!, onRetry: provider.refresh),
+          if (equivalents.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text('Setara: ${equivalents.map((e) => e.value).join('  |  ')}'),
+          ],
+          const SizedBox(height: 12),
+
+          // Alias donatur
+          TextField(
+            controller: _aliasController,
+            decoration: const InputDecoration(
+              labelText: 'Alias donatur',
+              border: OutlineInputBorder(),
+            ),
+            onChanged: provider.setAlias,
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Donasi bersifat simulasi, tidak ada pembayaran riil.',
+            style: TextStyle(fontSize: 12),
+          ),
+          const SizedBox(height: 12),
+
+          ElevatedButton(
+            onPressed: provider.saving || provider.selectedCampaign == null
+                ? null
+                : _confirm,
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size.fromHeight(48),
+            ),
+            child: provider.saving
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text('Konfirmasi donasi'),
+          ),
+          if (provider.submitError != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              provider.submitError!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+          ],
+
+          // Riwayat donasi
+          if (history.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            const Text(
+              'Riwayat donasi',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            for (final d in history)
+              Card(
+                child: ListTile(
+                  title: Text(d.campaignTitle),
+                  subtitle: Text(
+                    'Blok #${d.blockIndex} · ${d.isSynced ? 'Tercatat di server' : 'Menunggu sinkronisasi'}',
+                  ),
+                  trailing: Text(
+                    provider.formatMoney(d.amount, d.currency),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  onTap: () => _openReceipt(d),
+                ),
+              ),
+          ],
         ],
-      ],
+      ),
     );
   }
+}
+
+class _DonationLoadError extends StatelessWidget {
+  const _DonationLoadError({required this.message, required this.onRetry});
+
+  final String message;
+  final Future<void> Function() onRetry;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Column(
+          children: [
+            Text(message, textAlign: TextAlign.center),
+            TextButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Coba lagi'),
+            ),
+          ],
+        ),
+      );
 }

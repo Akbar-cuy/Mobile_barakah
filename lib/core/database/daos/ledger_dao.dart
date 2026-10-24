@@ -102,6 +102,38 @@ class LedgerDao extends DatabaseAccessor<AppDatabase> with _$LedgerDaoMixin {
 
   Future<void> markFailed(int idx) => _setSyncState(idx, SyncState.failed);
 
+  /// Roll back a donation block only when it is still the local pending head.
+  /// A newly-created genesis is removed with it when no other block depends on it.
+  Future<void> rollbackPendingDonation({
+    required int idx,
+    int? genesisIndex,
+  }) {
+    return transaction(() async {
+      final head = await getLatest();
+      final donation = await getByIndex(idx);
+      if (head?.idx != idx ||
+          donation == null ||
+          donation.syncState == SyncState.synced) {
+        throw const LedgerAppendException(
+          'Donasi lokal tidak dapat dibatalkan karena ledger sudah berubah.',
+        );
+      }
+      await (delete(ledgerLocalTable)..where((row) => row.idx.equals(idx)))
+          .go();
+      if (genesisIndex != null) {
+        final genesis = await getByIndex(genesisIndex);
+        final latest = await getLatest();
+        if (genesis != null &&
+            latest?.idx == genesisIndex &&
+            genesis.syncState != SyncState.synced) {
+          await (delete(ledgerLocalTable)
+                ..where((row) => row.idx.equals(genesisIndex)))
+              .go();
+        }
+      }
+    });
+  }
+
   Future<void> _setSyncState(int idx, String state) async {
     await (update(ledgerLocalTable)..where((t) => t.idx.equals(idx)))
         .write(LedgerLocalTableCompanion(syncState: Value(state)));

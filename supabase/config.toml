@@ -20,6 +20,9 @@ verify_jwt = false
 [functions.donations]
 verify_jwt = false
 
+[functions.campaigns]
+verify_jwt = false
+
 [functions.ledger]
 verify_jwt = false
 

@@ -61,12 +61,22 @@ class DonationReceiptScreen extends StatelessWidget {
         children: [
           const Icon(Icons.check_circle, size: 64, color: Colors.green),
           const SizedBox(height: 8),
-          const Text(
-            'Donasi tercatat',
+          Text(
+            donation.isSynced
+                ? 'Donasi tercatat di server'
+                : 'Menunggu sinkronisasi',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
+          if (!donation.isSynced)
+            const Padding(
+              padding: EdgeInsets.only(bottom: 12),
+              child: Text(
+                'Donasi tersimpan di perangkat dan menunggu sinkronisasi ke server.',
+                textAlign: TextAlign.center,
+              ),
+            ),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
