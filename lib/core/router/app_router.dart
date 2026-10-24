@@ -11,7 +11,6 @@ import '../../features/auth/screens/register_screen.dart';
 import '../../features/auth/screens/splash_screen.dart';
 import '../../features/converter/screens/converter_screen.dart';
 import '../../features/donation/screens/donation_screen.dart';
-import '../../features/donation/screens/zakat_screen.dart';
 import '../../features/feedback/screens/feedback_screen.dart';
 import '../../features/games/screens/direction_game_screen.dart';
 import '../../features/games/screens/quiz_category_screen.dart';
@@ -85,7 +84,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: RouteNames.converter, builder: (_, __) => const ConverterScreen()),
       GoRoute(path: RouteNames.donation, builder: (_, __) => const DonationScreen()),
-      GoRoute(path: RouteNames.zakat, builder: (_, __) => const ZakatScreen()),
+      GoRoute(path: RouteNames.zakat, builder: (_, __) => const DonationScreen()),
       GoRoute(path: RouteNames.aiChat, builder: (_, __) => const AiChatScreen()),
       GoRoute(path: RouteNames.quiz, builder: (_, __) => const QuizCategoryScreen()),
       GoRoute(
