@@ -20,7 +20,7 @@ void main() {
     };
 
     cases.forEach((name, v) {
-      test('$name', () {
+      test(name, () {
         final r = QiblaCalculator.calculate(v[0], v[1]);
         expect(r.bearing, closeTo(v[2], 0.05));
         expect(r.distanceKm, closeTo(v[3], 1.0));

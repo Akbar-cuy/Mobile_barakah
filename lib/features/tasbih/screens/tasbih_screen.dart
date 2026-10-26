@@ -49,6 +49,7 @@ class _TasbihScreenState extends ConsumerState<TasbihScreen>
   Future<void> _customTarget() async {
     final formKey = GlobalKey<FormState>();
     final field = TextEditingController();
+    const targetHint = '${TasbihLimits.minTarget} - ${TasbihLimits.maxTarget}';
     final value = await showDialog<int>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -59,8 +60,8 @@ class _TasbihScreenState extends ConsumerState<TasbihScreen>
             controller: field,
             autofocus: true,
             keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              hintText: '${TasbihLimits.minTarget} - ${TasbihLimits.maxTarget}',
+            decoration: const InputDecoration(
+              hintText: targetHint,
             ),
             validator: (v) {
               final n = int.tryParse((v ?? '').trim());

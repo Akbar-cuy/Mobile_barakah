@@ -155,7 +155,7 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen>
 
   Widget _noLocation(BuildContext context, QiblaState s) {
     final theme = Theme.of(context);
-    final (String text, String? action, VoidCallback? onAction) = switch (s.location) {
+    final (String text, String action, VoidCallback onAction) = switch (s.location) {
       QiblaLocationStatus.denied => (
           'Izin lokasi diperlukan untuk menghitung arah kiblat dari posisi Anda.',
           'Izinkan lokasi',
@@ -186,8 +186,7 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen>
         const SizedBox(height: AppSpacing.lg),
         Text(text, textAlign: TextAlign.center, style: theme.textTheme.bodyLarge),
         const SizedBox(height: AppSpacing.xl),
-        if (action != null)
-          FilledButton(onPressed: onAction, child: Text(action)),
+        FilledButton(onPressed: onAction, child: Text(action)),
         const SizedBox(height: AppSpacing.md),
         OutlinedButton(onPressed: _pickCity, child: const Text('Pilih kota manual')),
       ],

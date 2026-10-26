@@ -44,7 +44,7 @@ class _HeroPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     canvas.scale(size.width / _w);
-    final bg = Rect.fromLTWH(0, 0, _w, _h);
+    final bg = const Rect.fromLTWH(0, 0, _w, _h);
     canvas.drawRect(
       bg,
       Paint()

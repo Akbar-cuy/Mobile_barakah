@@ -106,7 +106,7 @@ void main() {
       final plan = PrayerScheduler.plan(
         days: [
           const PrayerDay(date: 'bukan-tanggal', utcOffsetMinutes: 0, times: {}),
-          PrayerDay(date: '2026-01-02', utcOffsetMinutes: 420, times: const {PrayerSlot.fajr: 'x'}),
+          const PrayerDay(date: '2026-01-02', utcOffsetMinutes: 420, times: {PrayerSlot.fajr: 'x'}),
         ],
         prefs: const NotificationPrefs(),
         now: now,

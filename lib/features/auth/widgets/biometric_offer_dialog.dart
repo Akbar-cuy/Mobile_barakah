@@ -51,10 +51,12 @@ class _BiometricOfferDialogState extends ConsumerState<BiometricOfferDialog> {
         });
       }
     } on ApiException catch (e) {
-      if (mounted) setState(() {
-        _loading = false;
-        _error = e.message;
-      });
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _error = e.message;
+        });
+      }
     }
   }
 

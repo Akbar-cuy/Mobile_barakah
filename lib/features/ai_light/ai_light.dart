@@ -246,7 +246,7 @@ class DhikrTargetPredictor {
     final target = (total / dipakai.length).round();
 
     if (target < 1) {
-      return PrediksiDzikir(
+      return const PrediksiDzikir(
         target: targetBawaan,
         adaPrediksi: false,
         alasan: 'Belum ada dzikir tercatat, memakai target bawaan $targetBawaan.',
