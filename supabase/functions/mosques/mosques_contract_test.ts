@@ -8,7 +8,7 @@ import {
 import {
   assertEquals,
   assertNotEquals,
-} from "https://deno.land/std@0.224.0/assert/mod.ts";
+} from "@std/assert";
 
 Deno.test("nearby request validates coordinates, radius and query keys", () => {
   assertEquals(
