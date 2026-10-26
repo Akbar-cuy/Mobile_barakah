@@ -103,6 +103,79 @@ export function normalizeOverpassElements(
   return deduplicated;
 }
 
+const PHOTON_URL = "https://photon.komoot.io/api/";
+const PHOTON_LIMIT = 50;
+
+/**
+ * Alamat pencarian Photon (cadangan bila semua server Overpass gagal).
+ * Photon tidak punya filter radius, jadi dipakai kotak batas (bbox) di sekitar
+ * titik; penyaringan jarak sebenarnya tetap dilakukan normalizeOverpassElements.
+ */
+export function makePhotonUrl(request: NearbyRequest): string {
+  const dLat = request.radiusKm / 111.32;
+  const cosLat = Math.max(0.01, Math.cos(request.lat * Math.PI / 180));
+  const dLon = request.radiusKm / (111.32 * cosLat);
+  const clamp = (v: number, min: number, max: number) =>
+    Math.min(max, Math.max(min, v));
+  const bbox = [
+    clamp(request.lon - dLon, -180, 180),
+    clamp(request.lat - dLat, -90, 90),
+    clamp(request.lon + dLon, -180, 180),
+    clamp(request.lat + dLat, -90, 90),
+  ].map((v) => v.toFixed(5)).join(",");
+  const params = new URLSearchParams({
+    q: request.query || "masjid",
+    lat: String(request.lat),
+    lon: String(request.lon),
+    osm_tag: "amenity:place_of_worship",
+    bbox,
+    limit: String(PHOTON_LIMIT),
+  });
+  return `${PHOTON_URL}?${params.toString()}`;
+}
+
+const PHOTON_TYPES: Record<string, string> = {
+  N: "node",
+  W: "way",
+  R: "relation",
+};
+
+/**
+ * Mengubah GeoJSON Photon menjadi bentuk elemen Overpass supaya memakai
+ * normalizeOverpassElements yang sama (jarak, duplikat, pencarian nama).
+ * Mengembalikan null bila bentuk respons tidak dikenali.
+ */
+export function photonToElements(payload: unknown): OverpassElement[] | null {
+  if (!payload || typeof payload !== "object") return null;
+  const features = (payload as { features?: unknown }).features;
+  if (!Array.isArray(features)) return null;
+  const elements: OverpassElement[] = [];
+  for (const feature of features) {
+    if (!feature || typeof feature !== "object") continue;
+    const { geometry, properties } = feature as {
+      geometry?: { coordinates?: unknown };
+      properties?: Record<string, unknown>;
+    };
+    const coords = geometry?.coordinates;
+    if (!Array.isArray(coords) || coords.length < 2) continue;
+    if (!properties || typeof properties !== "object") continue;
+    const type = PHOTON_TYPES[String(properties.osm_type)];
+    const id = properties.osm_id;
+    if (!type || typeof id !== "number") continue;
+    const tags: Record<string, string> = {};
+    const put = (key: string, value: unknown) => {
+      if (typeof value === "string" && value.trim()) tags[key] = value.trim();
+    };
+    put("name", properties.name);
+    put("addr:street", properties.street);
+    put("addr:suburb", properties.district);
+    put("addr:city", properties.city);
+    put("addr:postcode", properties.postcode);
+    elements.push({ type, id, lon: coords[0], lat: coords[1], tags });
+  }
+  return elements;
+}
+
 export function makeOverpassQuery(request: NearbyRequest): string {
   const radius = request.radiusKm * 1000;
   const lat = request.lat;

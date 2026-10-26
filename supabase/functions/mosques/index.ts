@@ -5,8 +5,10 @@ import { serveRoutes } from "../_shared/router.ts";
 import {
   type NearbyRequest,
   makeOverpassQuery,
+  makePhotonUrl,
   normalizeOverpassElements,
   parseNearbyRequest,
+  photonToElements,
 } from "./mosques_contract.ts";
 
 // Server Overpass publik sering menolak atau melambat (429, 504). Dicoba
@@ -18,7 +20,11 @@ const OVERPASS_ENDPOINTS = [
 ];
 // Overpass menolak permintaan tanpa identitas yang jelas.
 const USER_AGENT = "BarakahApp/1.0 (aplikasi ibadah mahasiswa; Supabase Edge Function)";
-const REQUEST_TIMEOUT_MS = 12_000;
+// Klien aplikasi menunggu paling lama 20 detik, jadi total waktu server harus
+// di bawah itu: Overpass maksimal 10 detik, lalu cadangan Photon 6 detik.
+const REQUEST_TIMEOUT_MS = 7_000;
+const OVERPASS_BUDGET_MS = 10_000;
+const PHOTON_TIMEOUT_MS = 6_000;
 const MAX_RESPONSE_BYTES = 5 * 1024 * 1024;
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const CACHE_MAX_ENTRIES = 100;
@@ -43,7 +49,11 @@ function cacheKey(input: NearbyRequest): string {
 }
 
 /** Mengambil elemen Overpass dari satu server, atau null bila gagal. */
-async function queryEndpoint(url: string, query: string): Promise<unknown[] | null> {
+async function queryEndpoint(
+  url: string,
+  query: string,
+  timeoutMs: number,
+): Promise<unknown[] | null> {
   const host = new URL(url).host;
   try {
     const upstream = await fetch(url, {
@@ -54,7 +64,7 @@ async function queryEndpoint(url: string, query: string): Promise<unknown[] | nu
         "User-Agent": USER_AGENT,
       },
       body: new URLSearchParams({ data: query }),
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
     });
     if (!upstream.ok) {
       console.error("Overpass endpoint rejected the request.", {
@@ -89,6 +99,28 @@ async function queryEndpoint(url: string, query: string): Promise<unknown[] | nu
   }
 }
 
+/** Cadangan: Photon (data OpenStreetMap). Null bila gagal. */
+async function queryPhoton(input: NearbyRequest): Promise<unknown[] | null> {
+  try {
+    const upstream = await fetch(makePhotonUrl(input), {
+      headers: { "Accept": "application/json", "User-Agent": USER_AGENT },
+      signal: AbortSignal.timeout(PHOTON_TIMEOUT_MS),
+    });
+    if (!upstream.ok) {
+      console.error("Photon rejected the request.", { status: upstream.status });
+      return null;
+    }
+    const elements = photonToElements(JSON.parse(await readLimitedBody(upstream)));
+    if (elements === null) console.error("Photon returned an unknown shape.");
+    return elements;
+  } catch (error) {
+    console.error("Photon request failed.", {
+      errorType: error instanceof Error ? error.name : "unknown",
+    });
+    return null;
+  }
+}
+
 async function nearby(req: Request, ctx: { url: URL }): Promise<Response> {
   const db = getAdminClient();
   const user = await requireUser(req, db);
@@ -106,8 +138,15 @@ async function nearby(req: Request, ctx: { url: URL }): Promise<Response> {
   }
 
   const query = makeOverpassQuery(input);
+  const deadline = Date.now() + OVERPASS_BUDGET_MS;
   for (const endpoint of OVERPASS_ENDPOINTS) {
-    const elements = await queryEndpoint(endpoint, query);
+    const remaining = deadline - Date.now();
+    if (remaining < 1_500) break;
+    const elements = await queryEndpoint(
+      endpoint,
+      query,
+      Math.min(REQUEST_TIMEOUT_MS, remaining),
+    );
     if (elements === null) continue;
     const items = normalizeOverpassElements(elements, input);
     if (cache.size >= CACHE_MAX_ENTRIES) {
@@ -116,6 +155,12 @@ async function nearby(req: Request, ctx: { url: URL }): Promise<Response> {
     }
     cache.set(key, { at: Date.now(), items });
     return json({ items });
+  }
+  // Semua server Overpass gagal: coba Photon. Hasil cadangan tidak disimpan di
+  // cache supaya Overpass langsung dipakai lagi begitu pulih.
+  const fallback = await queryPhoton(input);
+  if (fallback !== null) {
+    return json({ items: normalizeOverpassElements(fallback, input), source: "photon" });
   }
   return UNAVAILABLE();
 }
