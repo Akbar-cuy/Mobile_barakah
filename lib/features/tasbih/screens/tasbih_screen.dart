@@ -47,45 +47,10 @@ class _TasbihScreenState extends ConsumerState<TasbihScreen>
   }
 
   Future<void> _customTarget() async {
-    final formKey = GlobalKey<FormState>();
-    final field = TextEditingController();
-    const targetHint = '${TasbihLimits.minTarget} - ${TasbihLimits.maxTarget}';
     final value = await showDialog<int>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Target kustom'),
-        content: Form(
-          key: formKey,
-          child: TextFormField(
-            controller: field,
-            autofocus: true,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              hintText: targetHint,
-            ),
-            validator: (v) {
-              final n = int.tryParse((v ?? '').trim());
-              if (n == null || !TasbihLimits.isValidTarget(n)) {
-                return 'Isi angka ${TasbihLimits.minTarget}-${TasbihLimits.maxTarget}';
-              }
-              return null;
-            },
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
-          FilledButton(
-            onPressed: () {
-              if (formKey.currentState!.validate()) {
-                Navigator.pop(ctx, int.parse(field.text.trim()));
-              }
-            },
-            child: const Text('Pakai'),
-          ),
-        ],
-      ),
+      builder: (_) => const _CustomTargetDialog(),
     );
-    field.dispose();
     if (value != null) await _controller.setTarget(value);
   }
 
@@ -223,6 +188,67 @@ class _TasbihScreenState extends ConsumerState<TasbihScreen>
           ),
         ],
       ),
+    );
+  }
+}
+
+// Dialog target kustom. Controller dimiliki dan dibuang oleh State dialog
+// sendiri, jadi baru dibuang setelah rute dialog benar-benar lepas dari layar
+// (bukan sesaat setelah Navigator.pop saat animasi tutup masih berjalan).
+class _CustomTargetDialog extends StatefulWidget {
+  const _CustomTargetDialog();
+
+  @override
+  State<_CustomTargetDialog> createState() => _CustomTargetDialogState();
+}
+
+class _CustomTargetDialogState extends State<_CustomTargetDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _field = TextEditingController();
+
+  @override
+  void dispose() {
+    _field.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Target kustom'),
+      content: Form(
+        key: _formKey,
+        child: TextFormField(
+          controller: _field,
+          autofocus: true,
+          keyboardType: TextInputType.number,
+          // ignore: prefer_const_constructors
+          decoration: InputDecoration(
+            hintText: '${TasbihLimits.minTarget} - ${TasbihLimits.maxTarget}',
+          ),
+          validator: (v) {
+            final n = int.tryParse((v ?? '').trim());
+            if (n == null || !TasbihLimits.isValidTarget(n)) {
+              return 'Isi angka ${TasbihLimits.minTarget}-${TasbihLimits.maxTarget}';
+            }
+            return null;
+          },
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal'),
+        ),
+        FilledButton(
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              Navigator.pop(context, int.parse(_field.text.trim()));
+            }
+          },
+          child: const Text('Pakai'),
+        ),
+      ],
     );
   }
 }
